@@ -91,6 +91,8 @@ export default class LoginContainer extends React.Component<Props, State> {
 
         if(jsonObj.result == 'True') {
           AsyncStorage.setItem('@ApiKeysStore:otpKey', jsonObj.reason);
+          AsyncStorage.setItem('@ApiKeysStore:period', "" + jsonObj.period);
+          AsyncStorage.setItem('@ApiKeysStore:digits', "" + jsonObj.digits);
 
           loginForm.saveUserAuthInfo();
           navigation.navigate("Drawer");

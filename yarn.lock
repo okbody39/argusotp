@@ -5526,6 +5526,10 @@ react-native-maps@0.21.0:
     babel-plugin-module-resolver "^2.3.0"
     babel-preset-react-native "1.9.0"
 
+react-native-progress-bar@mattslight/react-native-progress-bar:
+  version "0.1.2"
+  resolved "https://codeload.github.com/mattslight/react-native-progress-bar/tar.gz/b5923d77de663b2d197036340ecb1d68f3abb2b1"
+
 react-native-pure-chart@0.0.24:
   version "0.0.24"
   resolved "https://registry.yarnpkg.com/react-native-pure-chart/-/react-native-pure-chart-0.0.24.tgz#6a06d803d6bce0d6cdb94ee426e32cfce95f19a1"

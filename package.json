@@ -47,6 +47,7 @@
     "react": "16.2.0",
     "react-native": "0.51.0",
     "react-native-chart-kit": "^1.1.6",
+    "react-native-progress-bar": "mattslight/react-native-progress-bar",
     "react-native-pure-chart": "0.0.24",
     "react-native-sparkline": "^1.0.5-beta",
     "react-navigation": "1.0.0-beta.21"

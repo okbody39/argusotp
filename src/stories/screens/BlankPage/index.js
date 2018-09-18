@@ -1,7 +1,9 @@
 import * as React from "react";
-import { Container, Header, Title, Content, Text, Button, Icon, Left, Right, Body, Card, CardItem } from "native-base";
+import { Image, Platform } from "react-native";
+import { Container, Header, Title, Content, Text, Button, Icon, Left, Right, Body, Card, CardItem, Row } from "native-base";
 
 import styles from "./styles";
+// import {Image} from "../Login";
 export interface Props {
 	navigation: any;
 }
@@ -27,18 +29,24 @@ class BlankPage extends React.Component<Props, State> {
 
 				<Content padder>
           <Card>
-            <CardItem header>
-              <Text>SeedAuth Mobile</Text>
-            </CardItem>
             <CardItem>
               <Body>
+              <Image
+                source={require("../../../../assets/logo-seedauth.png")}
+                style={{width: 600 / 4, height: 172 / 4}}
+              />
               <Text>
                 SeedAuth Mobile is Mobile OTP(One-time password) App for SeedCloud and SeedVDI.
               </Text>
               </Body>
             </CardItem>
-            <CardItem header>
-              <Text>Copyright 2018 DFOCUS Inc.</Text>
+            <CardItem>
+              <Row>
+                <Left/>
+                <Right style={{flex: 3}}>
+                  <Text note>Copyright 2018 DFOCUS Inc.</Text>
+                </Right>
+              </Row>
             </CardItem>
           </Card>
 				</Content>
