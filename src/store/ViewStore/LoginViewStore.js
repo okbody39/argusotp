@@ -1,25 +1,86 @@
 import { observable, action } from "mobx";
+import { AsyncStorage } from 'react-native';
 
 class LoginStore {
-  @observable email = "";
+  @observable userId = "";
   @observable password = "";
   @observable isValid = false;
-  @observable emailError = "";
+  @observable userIdError = "";
   @observable passwordError = "";
+  @observable otpKey = "";
 
-  @action
-  emailOnChange(id) {
-    this.email = id;
-    this.validateEmail();
+  @action async saveUserAuthInfo() {
+    try{
+      await AsyncStorage.setItem('@ApiKeysStore:userId', this.userId);
+      await AsyncStorage.setItem('@ApiKeysStore:userPassword', this.password);
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  @action async checkUserAuthInfo() {
+    try{
+      //TODO: encryption
+      let userToken = await AsyncStorage.getItem('@ApiKeysStore:userId');
+      return userToken.toString();
+    } catch(e) {
+      // console.log(e);
+      return null;
+    }
+  }
+
+  @action async resetUserAuthInfo() {
+    try{
+      this.userId = "";
+      this.isValid = false;
+      this.userIdError = "";
+      this.password = "";
+      this.passwordError = "";
+      this.otpKey = "";
+
+      await AsyncStorage.removeItem('@ApiKeysStore:userId');
+      await AsyncStorage.removeItem('@ApiKeysStore:userPassword');
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  @action async loadUserAuthInfo() {
+    try {
+      this.userId = await AsyncStorage.getItem('@ApiKeysStore:userId');
+      this.password = await AsyncStorage.getItem('@ApiKeysStore:userPassword');
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @action
-  validateEmail() {
-    const emailPatter = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-    const required = this.email ? undefined : "Required";
-    this.emailError = required
+  userIdOnChange(id) {
+    this.userId = id;
+    this.validateUserId();
+  }
+
+  @action
+  validateUserId() {
+    // const alphaNumeric = /[^a-zA-Z0-9 ]/i;
+    // const required = this.userId ? undefined : "Required";
+    // this.userIdError = required
+    //   ? required
+    //   : alphaNumeric.test(this.userId) ? undefined : "Invalid user ID";
+
+    const required = this.userId ? undefined : "Required";
+    const alphaNumeric = /[^a-zA-Z0-9 ]/i.test(this.userId)
+      ? "Only alphanumeric characters"
+      : undefined;
+    const maxLength =
+      this.userId.length > 15 ? "Must be 15 characters or less" : undefined;
+    const minLength =
+      this.userId.length < 4 ? "Must be 4 characters or more" : undefined;
+
+    this.userIdError = required
       ? required
-      : emailPatter.test(this.email) ? undefined : "Invalid email address";
+      : alphaNumeric ? alphaNumeric : maxLength ? maxLength : minLength;
+
   }
 
   @action
@@ -45,16 +106,16 @@ class LoginStore {
 
   @action
   validateForm() {
-    if (this.emailError === undefined && this.passwordError === undefined) {
+    if (this.userIdError === undefined && this.passwordError === undefined) {
       this.isValid = true;
     }
   }
 
   @action
   clearStore() {
-    this.email = "";
+    this.userId = "";
     this.isValid = false;
-    this.emailError = "";
+    this.userIdError = "";
     this.password = "";
     this.passwordError = "";
   }

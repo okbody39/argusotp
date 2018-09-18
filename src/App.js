@@ -9,6 +9,7 @@ import Sidebar from "./container/SidebarContainer";
 import Overview from "./container/OverviewContainer";
 import VMs from "./container/VMsContainer";
 import AuthLoading from "./container/AuthLoadingContainer";
+import Setting from "./container/SettingContainer";
 
 const Drawer = DrawerNavigator(
 	{
@@ -22,10 +23,11 @@ const Drawer = DrawerNavigator(
 
 const AppStack = StackNavigator(
 		{
-			// Login: { screen: Login },
+			Logout: { screen: Login },
 			BlankPage: { screen: BlankPage },
 			Overview: { screen: Overview },
 			VMs: { screen: VMs },
+      Setting: { screen: Setting },
 			Drawer: { screen: Drawer },
 		},
 		{

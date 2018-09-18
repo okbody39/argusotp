@@ -4,7 +4,7 @@
     "slug": "SeedAuthMobile",
     "loading": {
       "hideExponentText": false,
-      "icon": "./assets/loading.png"
+      "icon": "./assets/seedauth-icon.png"
     },
     "orientation": "portrait",
     "primaryColor": "#cccccc",
