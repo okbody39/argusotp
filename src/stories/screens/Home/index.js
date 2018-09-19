@@ -4,12 +4,12 @@ import {
   Text, Button, Icon, Left, Body, Right,
   List, ListItem, Row, Col,
   Card, CardItem,
-  H1, H2, H3
+  H1, H2, H3, View
 } from "native-base";
 
 import styles from "./styles";
 // import Sparkline from "react-native-sparkline";
-import ProgressBar from 'react-native-progress-bar';
+import ProgressBar from "react-native-progress-bar";
 
 import OTP from "otp-client";
 import { AsyncStorage } from "react-native";
@@ -37,7 +37,7 @@ class Home extends React.Component<Props, State> {
       otpKey: null,
       period: 60,
       digits: 6,
-      textColor: "#000000",
+      textColor: "#3b5998",
       progress: 0,
     };
 
@@ -95,7 +95,7 @@ class Home extends React.Component<Props, State> {
         prevToken: prevToken,
         nextToken: nextToken,
         nextTokenSecond: timeLeft,
-        textColor: otp.getTimeUntilNextTick() < 10 ? "#ff0000" : "#000000",
+        textColor: otp.getTimeUntilNextTick() < 10 ? "#de0607" : "#3b5998",
         progress: progress,
       });
 
@@ -129,11 +129,11 @@ class Home extends React.Component<Props, State> {
         </Header>
 
         <Content padder>
-          <Card style={{ alignItems: 'center', paddingTop: 30 }}>
-            <H3 style={{color: 'grey'}}>
+          <Card style={{ alignItems: "center", paddingTop: 30 }}>
+            <H3 style={{color: "grey"}}>
               VERIFY YOUR
             </H3>
-            <H3 style={{color: 'grey'}}>
+            <H3 style={{color: "grey"}}>
             PASSWORD
             </H3>
             {/*<CardItem header>*/}
@@ -176,7 +176,7 @@ class Home extends React.Component<Props, State> {
                   {/*{this.state.nextToken}*/}
                 {/*</TextLetterSpacing>*/}
                 <ProgressBar
-                  fillStyle={{}}
+                  fillStyle={{backgroundColor: this.state.textColor}}
                   backgroundStyle={{backgroundColor: "#cccccc", borderRadius: 2}}
                   style={{marginTop: 10, width: 300}}
                   progress={this.state.progress}
@@ -192,6 +192,12 @@ class Home extends React.Component<Props, State> {
               </Row>
             </CardItem>
           </Card>
+
+          <View padder>
+            <Button block onPress={() => this.props.navigation.navigate("ServerInfo")}>
+              <Text>OTP Server Information</Text>
+            </Button>
+          </View>
         </Content>
       </Container>
     );

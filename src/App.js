@@ -6,10 +6,11 @@ import Login from "./container/LoginContainer";
 import Home from "./container/HomeContainer";
 import BlankPage from "./container/BlankPageContainer";
 import Sidebar from "./container/SidebarContainer";
-import Overview from "./container/OverviewContainer";
-import VMs from "./container/VMsContainer";
+// import Overview from "./container/OverviewContainer";
+// import VMs from "./container/VMsContainer";
 import AuthLoading from "./container/AuthLoadingContainer";
 import Setting from "./container/SettingContainer";
+import ServerInfo from "./container/ServerInfoContainer";
 
 const Drawer = DrawerNavigator(
 	{
@@ -25,8 +26,7 @@ const AppStack = StackNavigator(
 		{
 			Logout: { screen: Login },
 			BlankPage: { screen: BlankPage },
-			Overview: { screen: Overview },
-			VMs: { screen: VMs },
+			ServerInfo: { screen: ServerInfo },
       Setting: { screen: Setting },
 			Drawer: { screen: Drawer },
 		},
