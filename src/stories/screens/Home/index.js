@@ -123,18 +123,24 @@ class Home extends React.Component<Props, State> {
             </Button>
           </Left>
           <Body>
-            <Title>Home</Title>
+            <Title>OTP</Title>
           </Body>
           <Right />
         </Header>
 
         <Content padder>
-          <Card style={{ alignItems: 'center' }}>
+          <Card style={{ alignItems: 'center', paddingTop: 30 }}>
+            <H3 style={{color: 'grey'}}>
+              VERIFY YOUR
+            </H3>
+            <H3 style={{color: 'grey'}}>
+            PASSWORD
+            </H3>
             {/*<CardItem header>*/}
               {/*<Text>{this.props.userId}</Text>*/}
             {/*</CardItem>*/}
-            <CardItem>
-              <Body>
+            {/*<CardItem>*/}
+              {/*<Body>*/}
                 {/*<TextLetterSpacing*/}
                   {/*spacing={3}*/}
                   {/*viewStyle={{ marginLeft: 15 }}*/}
@@ -152,6 +158,8 @@ class Home extends React.Component<Props, State> {
                   textStyle={{
                     fontSize: 42,
                     color: this.state.textColor,
+                    marginTop: 15,
+                    marginBottom: 10
                   }}
                 >
                   { this.state.token }
@@ -173,8 +181,8 @@ class Home extends React.Component<Props, State> {
                   style={{marginTop: 10, width: 300}}
                   progress={this.state.progress}
                 />
-              </Body>
-            </CardItem>
+              {/*</Body>*/}
+            {/*</CardItem>*/}
             <CardItem>
               <Row>
                 <Left/>

@@ -6,7 +6,7 @@ import { NavigationActions } from "react-navigation";
 const routes = [
 	{
 		route: "Home",
-		caption: "Home",
+		caption: "OTP",
 	},
   {
     route: "Setting",
@@ -36,8 +36,8 @@ export default class Sidebar extends React.Component<Props, State> {
     if(route === 'Logout') {
 
       Alert.alert(
-        '로그아웃',
-        '로그아웃을 실행하시겠습니까?',
+        'Logout',
+        'Are you sure you want to logout?',
         [
           {text: 'Cancel', onPress: () => {}, style: 'cancel'},
           {text: 'OK', onPress: () => this.props.navigation.dispatch(resetAction)},

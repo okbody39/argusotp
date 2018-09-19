@@ -47,7 +47,7 @@ export default class SettingContainer extends React.Component<Props, State> {
 
       }).catch(err => {
         Toast.show({
-          text: "서버 정보를 다시 확인해 주세요!",
+          text: "Server IP or Port invalid!",
           duration: 2000,
           position: "top",
           textStyle: { textAlign: "center" },

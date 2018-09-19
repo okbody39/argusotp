@@ -1,9 +1,12 @@
 // @flow
-import React from 'react';
+import React from "react";
 import {
   ActivityIndicator,
   AsyncStorage
-} from 'react-native';
+} from "react-native";
+import {
+  Content, Spinner
+} from "native-base";
 import {inject, observer} from "mobx-react/native";
 import {NavigationActions} from "react-navigation";
 export interface Props {
@@ -26,7 +29,7 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
 
     // console.log('AuthLoading...', userToken);
 
-    let routName = userToken ? 'App' : 'Auth';
+    let routName = userToken ? "App" : "Auth";
 
     this.props.navigation.dispatch(NavigationActions.reset({
       index: 0,
@@ -38,7 +41,9 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
 
   render() {
     return (
-        <ActivityIndicator />
+      <Content contentContainerStyle={{ justifyContent: "center", flex: 1 }}>
+        <Spinner />
+      </Content>
     );
   }
 }

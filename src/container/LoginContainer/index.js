@@ -2,9 +2,9 @@
 import * as React from "react";
 import { Item, Input, Icon, Form, Toast } from "native-base";
 import { observer, inject } from "mobx-react/native";
-import aesjs from 'aes-js';
-import axios from 'axios';
-import { AsyncStorage } from 'react-native';
+import aesjs from "aes-js";
+import axios from "axios";
+import { AsyncStorage } from "react-native";
 
 import Login from "../../stories/screens/Login";
 
@@ -26,17 +26,17 @@ export default class LoginContainer extends React.Component<Props, State> {
 
     let isLogout = navigation.state.params ? navigation.state.params.isLogout : false;
 
-    if(isLogout) {
+    if (isLogout) {
       await loginForm.resetUserAuthInfo();
       // await settingForm.resetOtpServerInfo();
     }
 
     await settingForm.loadOtpServerInfo();
 
-    if(!settingForm.encKey) {
+    if (!settingForm.encKey) {
       //navigation.navigate("Setting");
       Toast.show({
-        text: "서버 Setting을 먼저 해주세요!",
+        text: "Please setting your server first",
         duration: 2000,
         position: "top",
         textStyle: { textAlign: "center" },
@@ -47,9 +47,8 @@ export default class LoginContainer extends React.Component<Props, State> {
 
     await loginForm.loadUserAuthInfo();
 
-    if(loginForm.userId && loginForm.userId.length > 0) {
+    if (loginForm.userId && loginForm.userId.length > 0) {
       navigation.navigate("Drawer");
-      return;
     }
   }
 
@@ -63,7 +62,7 @@ export default class LoginContainer extends React.Component<Props, State> {
       const formPayload = {
         userid: loginForm.userId,
         userpassword: loginForm.password,
-        code: '',
+        code: "",
       };
 
       var key = aesjs.utils.utf8.toBytes(settingForm.encKey);
@@ -85,14 +84,14 @@ export default class LoginContainer extends React.Component<Props, State> {
         let decryptedBytes = aesEcb.decrypt(encryptedBytes);
         let decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
         // 중요 : 절대 삭제하지 말것!!!
-        let jsonText = decryptedText.substring(0, decryptedText.indexOf('}')+1);
+        let jsonText = decryptedText.substring(0, decryptedText.indexOf("}") + 1);
 
         let jsonObj = JSON.parse(jsonText);
 
-        if(jsonObj.result == 'True') {
-          AsyncStorage.setItem('@ApiKeysStore:otpKey', jsonObj.reason);
-          AsyncStorage.setItem('@ApiKeysStore:period', "" + jsonObj.period);
-          AsyncStorage.setItem('@ApiKeysStore:digits', "" + jsonObj.digits);
+        if (jsonObj.result === "True") {
+          AsyncStorage.setItem("@ApiKeysStore:otpKey", jsonObj.reason);
+          AsyncStorage.setItem("@ApiKeysStore:period", "" + jsonObj.period);
+          AsyncStorage.setItem("@ApiKeysStore:digits", "" + jsonObj.digits);
 
           loginForm.saveUserAuthInfo();
           navigation.navigate("Drawer");
@@ -112,7 +111,7 @@ export default class LoginContainer extends React.Component<Props, State> {
 
     } else {
       Toast.show({
-        text: "아이디 또는 비밀번호를 다시 확인해 주세요!",
+        text: "Username or password invalid!",
         duration: 2000,
         position: "top",
         textStyle: { textAlign: "center" },
@@ -124,7 +123,7 @@ export default class LoginContainer extends React.Component<Props, State> {
     const form = this.props.loginForm;
     const Fields = (
       <Form>
-        <Item error={form.userIdError ? true : false}>
+        <Item error={!!form.userIdError}>
           <Icon active name="person" />
           <Input
             placeholder="User ID"
@@ -135,7 +134,7 @@ export default class LoginContainer extends React.Component<Props, State> {
             onChangeText={e => form.userIdOnChange(e)}
           />
         </Item>
-        <Item error={form.passwordError ? true : false}>
+        <Item error={!!form.passwordError}>
           <Icon active name="unlock" />
           <Input
             placeholder="Password"
