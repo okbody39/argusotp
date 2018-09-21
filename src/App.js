@@ -39,9 +39,12 @@ const AppStack = StackNavigator(
 const AuthStack = StackNavigator(
 		{
       Login:  { screen: Login },
+      PreSetting: { screen: Setting },
+      AuthLoading:  { screen: AuthLoading },
+      App: { screen: AppStack },
 		},
     {
-      // initialRouteName: "Login",
+      initialRouteName: "Login",
       headerMode: "none",
     }
 	);

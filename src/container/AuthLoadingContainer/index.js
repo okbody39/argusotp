@@ -14,7 +14,7 @@ export interface Props {
 }
 export interface State {}
 
-@inject("loginForm")
+@inject("mainStore")
 @observer
 export default class AuthLoadingContainer extends React.Component<Props, State> {
   constructor(props) {
@@ -23,13 +23,12 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
   }
 
   _bootstrapAsync = async () => {
-    const { loginForm } = this.props;
+    const { mainStore } = this.props;
 
-    const userToken = await loginForm.checkUserAuthInfo();
+    await mainStore.loadUserToken();
+    await mainStore.loadOtpServerInfo();
 
-    // console.log('AuthLoading...', userToken);
-
-    let routName = userToken ? "App" : "Auth";
+    let routName = mainStore.isLogin ? "App" : "Auth";
 
     this.props.navigation.dispatch(NavigationActions.reset({
       index: 0,

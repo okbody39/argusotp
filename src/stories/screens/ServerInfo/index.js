@@ -14,7 +14,7 @@ class ServerInfo extends React.Component<Props, State> {
   }
 
 	render() {
-    const {navigation, settingForm} = this.props;
+    const { navigation, settingForm, loginForm } = this.props;
 
 		return (
 			<Container>
@@ -26,7 +26,7 @@ class ServerInfo extends React.Component<Props, State> {
 					</Left>
 
 					<Body style={{ flex: 3 }}>
-						<Title>OTP Server Info</Title>
+						<Title>Detail Inform.</Title>
 					</Body>
 
 					<Right />
@@ -35,6 +35,20 @@ class ServerInfo extends React.Component<Props, State> {
         <Content padder>
           <Card>
             <List>
+              <ListItem itemDivider>
+                <Text>User Information</Text>
+              </ListItem>
+              <ListItem>
+                <Body>
+                <Text>ID</Text>
+                </Body>
+                <Right style={{ flex: 1 }}>
+                  <Text note>{loginForm.userId}</Text>
+                </Right>
+              </ListItem>
+              <ListItem itemDivider>
+                <Text>OTP Server Information</Text>
+              </ListItem>
               <ListItem>
                 <Body>
                   <Text>IP</Text>
@@ -63,7 +77,7 @@ class ServerInfo extends React.Component<Props, State> {
           </Card>
           <View padder>
             <Button block info onPress={() => this.props.navigation.navigate("Setting")}>
-              <Text>Setting</Text>
+              <Text>Server Setting</Text>
             </Button>
           </View>
 				</Content>

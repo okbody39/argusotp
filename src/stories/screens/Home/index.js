@@ -195,7 +195,7 @@ class Home extends React.Component<Props, State> {
 
           <View padder>
             <Button block onPress={() => this.props.navigation.navigate("ServerInfo")}>
-              <Text>OTP Server Information</Text>
+              <Text>Detail Information</Text>
             </Button>
           </View>
         </Content>

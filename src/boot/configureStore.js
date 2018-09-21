@@ -1,4 +1,4 @@
-import MainStore from "../store/DomainStore/HomeStore";
+import MainStore from "../store/DomainStore/MainStore";
 import LoginStore from "../store/ViewStore/LoginViewStore";
 import SettingStore from "../store/ViewStore/SettingViewStore";
 

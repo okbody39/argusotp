@@ -14,26 +14,27 @@ export interface Props {
 }
 export interface State {}
 
-@inject("settingForm")
+@inject("settingForm", "loginForm")
 @observer
 export default class ServerInfoContainer extends React.Component<Props, State> {
   serverIpInput: any;
   serverPortInput: any;
 
   async componentDidMount() {
-    const { settingForm } = this.props;
+    const { settingForm, loginForm } = this.props;
 
     await settingForm.loadOtpServerInfo();
+    await loginForm.loadUserAuthInfo();
 
   }
 
   render() {
-    const { settingForm, navigation } = this.props;
+    const { settingForm, loginForm, navigation } = this.props;
 
     if(!settingForm.encKey) {
     	return <Spinner/>;
 		}
 
-    return <ServerInfo navigation={navigation} settingForm={settingForm} />;
+    return <ServerInfo navigation={navigation} settingForm={settingForm} loginForm={loginForm} />;
   }
 }

@@ -44,7 +44,7 @@ class Login extends React.Component<Props, State> {
 							</Button>
 					</View>
 					<View padder>
-						<Button block info onPress={() => this.props.navigation.navigate("Setting")}>
+						<Button block info onPress={() => this.props.navigation.navigate("PreSetting")}>
 							<Text>Setting</Text>
 						</Button>
 					</View>

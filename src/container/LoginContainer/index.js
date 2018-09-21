@@ -14,20 +14,20 @@ export interface Props {
 }
 export interface State {}
 
-@inject("settingForm")
-@inject("loginForm")
+@inject("settingForm", "loginForm", "mainStore")
 @observer
 export default class LoginContainer extends React.Component<Props, State> {
   userIdInput: any;
   pwdinput: any;
 
   async componentWillMount() {
-    const { loginForm, settingForm, navigation } = this.props;
+    const { loginForm, settingForm, navigation, mainStore } = this.props;
 
     let isLogout = navigation.state.params ? navigation.state.params.isLogout : false;
 
     if (isLogout) {
       await loginForm.resetUserAuthInfo();
+      await mainStore.saveUserToken({}, false);
       // await settingForm.resetOtpServerInfo();
     }
 
@@ -47,13 +47,13 @@ export default class LoginContainer extends React.Component<Props, State> {
 
     await loginForm.loadUserAuthInfo();
 
-    if (loginForm.userId && loginForm.userId.length > 0) {
+    if (mainStore.isLogin) {
       navigation.navigate("Drawer");
     }
   }
 
   login() {
-    const { loginForm, settingForm, navigation } = this.props;
+    const { loginForm, settingForm, navigation, mainStore } = this.props;
 
     loginForm.validateForm();
 
@@ -94,10 +94,17 @@ export default class LoginContainer extends React.Component<Props, State> {
           AsyncStorage.setItem("@ApiKeysStore:digits", "" + jsonObj.digits);
 
           loginForm.saveUserAuthInfo();
-          navigation.navigate("Drawer");
+          mainStore.saveUserToken(loginForm.userId, true);
+
+          setTimeout(() => {
+            navigation.navigate("AuthLoading");
+          }, 500);
+          // navigation.navigate("Drawer");
 
         } else {
           loginForm.resetUserAuthInfo();
+          mainStore.saveUserToken({}, false);
+
           Toast.show({
             text: jsonObj.reason,
             duration: 2000,
@@ -127,7 +134,8 @@ export default class LoginContainer extends React.Component<Props, State> {
           <Icon active name="person" />
           <Input
             placeholder="User ID"
-            keyboardType="default"
+            keyboardType="email-address"
+            autoCapitalize = "none"
             ref={c => (this.userIdInput = c)}
             value={form.userId}
             onBlur={() => form.validateUserId()}
@@ -138,6 +146,7 @@ export default class LoginContainer extends React.Component<Props, State> {
           <Icon active name="unlock" />
           <Input
             placeholder="Password"
+            autoCapitalize = "none"
             ref={c => (this.pwdinput = c)}
             value={form.password}
             onBlur={() => form.validatePassword()}

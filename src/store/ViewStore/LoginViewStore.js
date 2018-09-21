@@ -68,6 +68,13 @@ class LoginStore {
     //   ? required
     //   : alphaNumeric.test(this.userId) ? undefined : "Invalid user ID";
 
+    if(this.userId) {
+      //
+    } else {
+      this.userIdError = "Must need user ID";
+      return;
+    }
+
     const required = this.userId ? undefined : "Required";
     const alphaNumeric = /[^a-zA-Z0-9 ]/i.test(this.userId)
       ? "Only alphanumeric characters"
@@ -91,6 +98,14 @@ class LoginStore {
 
   @action
   validatePassword() {
+
+    if(this.password) {
+      //
+    } else {
+      this.passwordError = "Must need password";
+      return;
+    }
+
     const alphaNumeric = /[^a-zA-Z0-9 ]/i.test(this.password)
       ? "Only alphanumeric characters"
       : undefined;
