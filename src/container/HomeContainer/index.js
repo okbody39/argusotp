@@ -30,7 +30,7 @@ export interface Props {
 export interface State {}
 
 // @inject("mainStore")
-@inject("loginForm")
+@inject("loginForm", "settingForm")
 @observer
 export default class HomeContainer extends React.Component<Props, State> {
 
@@ -41,20 +41,21 @@ export default class HomeContainer extends React.Component<Props, State> {
   }
 
   _bootstrapAsync = async () => {
-    const { loginForm } = this.props;
+    const { loginForm, settingForm } = this.props;
 
     await loginForm.loadUserAuthInfo();
-    // console.log('HomeContainer....', loginForm.userId);
+    await settingForm.loadOtpServerInfo();
 
+    // console.log('HomeContainer....', loginForm.userId);
     // const userToken = await loginForm.checkUserAuthInfo();
 
   };
 
   render() {
-    const { loginForm, navigation } = this.props;
+    const { loginForm, navigation, settingForm } = this.props;
 
     // const list = this.props.mainStore.items.toJS();
-    return <Home navigation={navigation} userId={loginForm.userId} />;
+    return <Home navigation={navigation} userId={loginForm.userId} settingForm={settingForm} />;
 
 
   }

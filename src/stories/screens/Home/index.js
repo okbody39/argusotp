@@ -34,61 +34,63 @@ class Home extends React.Component<Props, State> {
       nextTokenSecond: 0,
       subTitle: this.props.userId,
       intervalId: null,
-      otpKey: null,
-      period: 60,
-      digits: 6,
+      // otpKey: this.props.settingForm.otpKey,
+      // period: this.props.settingForm.period, //60,
+      // digits: this.props.settingForm.digits,
       textColor: "#3b5998",
       progress: 0,
     };
 
   }
+
+
   componentDidMount() {
 
-
-
-    AsyncStorage.getItem("@ApiKeysStore:period", (err, result) => {
-      if (err) {
-        return;
-      }
-      this.setState({period: parseInt(result)});
-    });
-
-    AsyncStorage.getItem("@ApiKeysStore:digits", (err, result) => {
-      if (err) {
-        return;
-      }
-      this.setState({digits: parseInt(result)});
-    });
-
-    AsyncStorage.getItem("@ApiKeysStore:otpKey", (err, result) => {
-      if (err) {
-        return;
-      }
-      this.setState({otpKey: result});
-    });
+    // AsyncStorage.getItem("@ApiKeysStore:period", (err, result) => {
+    //   if (err) {
+    //     return;
+    //   }
+    //   this.setState({period: parseInt(result)});
+    // });
+    //
+    // AsyncStorage.getItem("@ApiKeysStore:digits", (err, result) => {
+    //   if (err) {
+    //     return;
+    //   }
+    //   this.setState({digits: parseInt(result)});
+    // });
+    //
+    // AsyncStorage.getItem("@ApiKeysStore:otpKey", (err, result) => {
+    //   if (err) {
+    //     return;
+    //   }
+    //   this.setState({otpKey: result});
+    // });
 
     let intervalId = setInterval(() => {
 
-      if (!this.state.otpKey) {
+      const { settingForm } = this.props;
+
+      // console.log(settingForm);
+
+      if (!settingForm.otpKey) {
         return;
       }
 
-      // console.log(this.state);
-
       var options = {
         algorithm: "sha1",
-        digits: this.state.digits,
-        period: this.state.period,
+        digits: parseInt(settingForm.digits),
+        period: parseInt(settingForm.period),
         epoch: null
       };
 
-      const otp = new OTP(this.props.userId + this.state.otpKey, options);
+      const otp = new OTP(this.props.userId + settingForm.otpKey, options);
       const token = otp.getToken();
       const prevToken = otp.getToken(-1);
       const nextToken = otp.getToken(1);
 
       let timeLeft = otp.getTimeUntilNextTick() + 1;
-      let progress = (this.state.period - timeLeft) / this.state.period;
+      let progress = (settingForm.period - timeLeft) / settingForm.period;
 
       this.setState({
         token: token,

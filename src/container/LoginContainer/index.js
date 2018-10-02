@@ -89,12 +89,19 @@ export default class LoginContainer extends React.Component<Props, State> {
         let jsonObj = JSON.parse(jsonText);
 
         if (jsonObj.result === "True") {
-          AsyncStorage.setItem("@ApiKeysStore:otpKey", jsonObj.reason);
-          AsyncStorage.setItem("@ApiKeysStore:period", "" + jsonObj.period);
-          AsyncStorage.setItem("@ApiKeysStore:digits", "" + jsonObj.digits);
+          // AsyncStorage.setItem("@ApiKeysStore:otpKey", jsonObj.reason);
+          // AsyncStorage.setItem("@ApiKeysStore:period", "" + jsonObj.period);
+          // AsyncStorage.setItem("@ApiKeysStore:digits", "" + jsonObj.digits);
+          //
+          // settingForm.otpKey = jsonObj.reason;
+          // settingForm.period = jsonObj.period;
+          // settingForm.digits = jsonObj.digits;
+
+          settingForm.setOtpInfo(jsonObj.reason, jsonObj.period, jsonObj.digits);
 
           loginForm.saveUserAuthInfo();
           mainStore.saveUserToken(loginForm.userId, true);
+          settingForm.saveOtpServerInfo();
 
           setTimeout(() => {
             navigation.navigate("AuthLoading");

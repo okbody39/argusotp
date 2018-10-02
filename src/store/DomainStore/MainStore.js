@@ -12,6 +12,8 @@ class MainStore {
   @observable otpServerIp = "";
   @observable otpServerPort = "";
   @observable encKey = "";
+  @observable period = "";
+  @observable digits = "";
 
   @action
   fetchItems(data) {
@@ -32,7 +34,7 @@ class MainStore {
 
       this.userToken = userToken;
 
-      if(this.userToken.length > 0) {
+      if (this.userToken.length > 0) {
         this.isLogin = true;
       }
     } catch (e) {
@@ -53,6 +55,8 @@ class MainStore {
       this.otpServerIp = await AsyncStorage.getItem("@ApiKeysStore:otpServerIp");
       this.otpServerPort = await AsyncStorage.getItem("@ApiKeysStore:otpServerPort");
       this.encKey = await AsyncStorage.getItem("@ApiKeysStore:encKey");
+      this.period = await AsyncStorage.getItem("@ApiKeysStore:period");
+      this.digits = await AsyncStorage.getItem("@ApiKeysStore:digits");
     } catch (e) {
       console.log(e);
     }

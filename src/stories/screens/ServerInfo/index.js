@@ -2,15 +2,35 @@ import * as React from "react";
 import { Container, Header, Title, Content, Text, Button, Icon, Left, Right, Body, List, ListItem, H1, Card, CardItem, View } from "native-base";
 import Sparkline from 'react-native-sparkline';
 import axios from 'axios';
-import OTP from 'otp-client'
+import OTP from 'otp-client';
+import {AsyncStorage} from "react-native";
 
 export interface Props {
 	navigation: any;
 }
 export interface State {}
 class ServerInfo extends React.Component<Props, State> {
-
+  constructor(props) {
+    super(props);
+    // this.state = {
+    //   period: 60,
+    //   digits: 6,
+    // };
+  }
   componentDidMount() {
+    // AsyncStorage.getItem("@ApiKeysStore:period", (err, result) => {
+    //   if (err) {
+    //     return;
+    //   }
+    //   this.setState({period: parseInt(result)});
+    // });
+    //
+    // AsyncStorage.getItem("@ApiKeysStore:digits", (err, result) => {
+    //   if (err) {
+    //     return;
+    //   }
+    //   this.setState({digits: parseInt(result)});
+    // });
   }
 
 	render() {
@@ -71,6 +91,22 @@ class ServerInfo extends React.Component<Props, State> {
                 </Body>
                 <Right style={{ flex: 1 }}>
                   <Text note>{settingForm.encKey}</Text>
+                </Right>
+              </ListItem>
+              <ListItem>
+                <Body>
+                <Text>Period</Text>
+                </Body>
+                <Right style={{ flex: 1 }}>
+                  <Text note>{settingForm.period}</Text>
+                </Right>
+              </ListItem>
+              <ListItem>
+                <Body>
+                <Text>Digits</Text>
+                </Body>
+                <Right style={{ flex: 1 }}>
+                  <Text note>{settingForm.digits}</Text>
                 </Right>
               </ListItem>
             </List>

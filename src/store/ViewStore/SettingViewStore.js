@@ -5,15 +5,25 @@ class SettingStore {
   @observable otpServerIp = "";
   @observable otpServerPort = "";
   @observable encKey = "";
+  @observable otpKey = "";
+
   @observable serverIpError = "";
   @observable serverPortError = "";
   @observable isValid = false;
+  @observable period = "";
+  @observable digits = "";
+
 
   @action async saveOtpServerInfo() {
     try{
       await AsyncStorage.setItem('@ApiKeysStore:otpServerIp', this.otpServerIp);
       await AsyncStorage.setItem('@ApiKeysStore:otpServerPort', this.otpServerPort);
       await AsyncStorage.setItem('@ApiKeysStore:encKey', this.encKey);
+      await AsyncStorage.setItem('@ApiKeysStore:otpKey', this.otpKey);
+
+      await AsyncStorage.setItem('@ApiKeysStore:period', this.period);
+      await AsyncStorage.setItem('@ApiKeysStore:digits', this.digits);
+
     } catch(e) {
       console.log(e);
     }
@@ -28,6 +38,10 @@ class SettingStore {
       await AsyncStorage.removeItem('@ApiKeysStore:otpServerIp');
       await AsyncStorage.removeItem('@ApiKeysStore:otpServerPort');
       await AsyncStorage.removeItem('@ApiKeysStore:encKey');
+      await AsyncStorage.removeItem('@ApiKeysStore:otpKey');
+
+      await AsyncStorage.removeItem('@ApiKeysStore:period');
+      await AsyncStorage.removeItem('@ApiKeysStore:digits');
 
     } catch(e) {
       console.log(e);
@@ -39,6 +53,10 @@ class SettingStore {
       this.otpServerIp = await AsyncStorage.getItem('@ApiKeysStore:otpServerIp');
       this.otpServerPort = await AsyncStorage.getItem('@ApiKeysStore:otpServerPort');
       this.encKey = await AsyncStorage.getItem('@ApiKeysStore:encKey');
+      this.otpKey = await AsyncStorage.getItem('@ApiKeysStore:otpKey');
+
+      this.period = await AsyncStorage.getItem('@ApiKeysStore:period');
+      this.digits = await AsyncStorage.getItem('@ApiKeysStore:digits');
     } catch (e) {
       console.log(e);
     }
@@ -87,10 +105,20 @@ class SettingStore {
   }
 
   @action
+  setOtpInfo(otpKey, period, digits) {
+    this.otpKey = otpKey;
+    this.period = "" + period;
+    this.digits = "" + digits;
+  }
+
+  @action
   clearStore() {
     this.otpServerIp = "";
     this.otpServerPort = "";
     this.encKey = "";
+    this.otpKey = "";
+    this.period = "";
+    this.digits = "";
     this.isValid = false;
   }
 }
