@@ -2,8 +2,8 @@
 import * as React from "react";
 import { Item, Input, Icon, Form, Toast, Spinner } from "native-base";
 import { observer, inject } from "mobx-react/native";
-import aesjs from "aes-js";
-import axios from "axios";
+// import aesjs from "aes-js";
+// import axios from "axios";
 import { AsyncStorage } from "react-native";
 
 import ServerInfo from "../../stories/screens/ServerInfo";

@@ -9,6 +9,8 @@ class MainStore {
   @observable userToken = "";
   @observable isLogin = false;
 
+  @observable pushToken = "";
+
   @observable otpServerIp = "";
   @observable otpServerPort = "";
   @observable encKey = "";
@@ -25,6 +27,11 @@ class MainStore {
   saveUserToken(data, isLogin) {
     this.userToken = data;
     this.isLogin = isLogin;
+  }
+
+  @action
+  setPushToken(data) {
+    this.pushToken = data;
   }
 
   @action

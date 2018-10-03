@@ -1,11 +1,11 @@
-// @flow
 import * as React from "react";
 import { Item, Input, Icon, Form, Toast } from "native-base";
 import { observer, inject } from "mobx-react/native";
-import aesjs from "aes-js";
+// import aesjs from "aes-js";
 import axios from "axios";
 import { AsyncStorage } from "react-native";
 
+import { encrypt, decrypt} from "../../utils/crypt";
 import Setting from "../../stories/screens/Setting";
 
 export interface Props {
@@ -13,6 +13,8 @@ export interface Props {
   settingForm: any,
 }
 export interface State {}
+
+const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 
 @inject("settingForm")
 @observer
@@ -30,6 +32,9 @@ export default class SettingContainer extends React.Component<Props, State> {
   save() {
     const { settingForm, navigation } = this.props;
 
+    settingForm.validateServerIp();
+    settingForm.validateServerPort();
+
     settingForm.validateForm();
 
     if (settingForm.isValid) {
@@ -39,19 +44,38 @@ export default class SettingContainer extends React.Component<Props, State> {
       }).then(res => {
         const result = res.data;
 
-        settingForm.encKey = result;
-        settingForm.saveOtpServerInfo();
+        // var key = aesjs.utils.utf8.toBytes(_DEFAULT_KEY_);
+        // var aesEcb = new aesjs.ModeOfOperation.ecb(key);
+        //
+        // let encryptedBytes = aesjs.utils.hex.toBytes(result);
+        // let decryptedBytes = aesEcb.decrypt(encryptedBytes);
+        // let decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+        //
+        // // 중요 : 절대 삭제하지 말것!!!
+        // let jsonText = decryptedText.substring(0, decryptedText.indexOf("}") + 1);
 
-        // navigation.navigate("Login");
+        let jsonText = decrypt(result, _DEFAULT_KEY_);
+
+        let jsonObj = JSON.parse(jsonText);
+
+        settingForm.saveOtpServerBasicInfo(jsonObj.encKey);
+
         navigation.goBack();
 
       }).catch(err => {
         Toast.show({
-          text: "Server IP or Port invalid!",
+          text: "OTP Server error!",
           duration: 2000,
           position: "top",
           textStyle: { textAlign: "center" },
         });
+      });
+    } else {
+      Toast.show({
+        text: "Server IP or Port invalid!",
+        duration: 2000,
+        position: "top",
+        textStyle: { textAlign: "center" },
       });
     }
   }
@@ -66,9 +90,7 @@ export default class SettingContainer extends React.Component<Props, State> {
           <Input
             placeholder="OTP Server IP"
             keyboardType="default"
-            ref={c => (this.serverIpInput = c)}
             value={settingForm.otpServerIp}
-						// onBlur={() => settingForm.validateServerIp()}
             onChangeText={e => settingForm.serverIpOnChange(e)}
           />
         </Item>
@@ -76,9 +98,7 @@ export default class SettingContainer extends React.Component<Props, State> {
           <Icon active name="unlock" />
           <Input
             placeholder="OTP Server Port"
-            ref={c => (this.serverPortInput = c)}
             value={settingForm.otpServerPort}
-						// onBlur={() => settingForm.validateServerPort()}
             onChangeText={e => settingForm.serverPortOnChange(e)}
           />
         </Item>

@@ -65,43 +65,55 @@ class SettingStore {
   @action
   serverIpOnChange(ip) {
     this.otpServerIp = ip;
-    // this.validateServerIp();
+    this.validateServerIp();
   }
 
-  // @action
-  // validateServerIp() {
-  //   const ipAddress = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/i.test(this.password)
-  //     ? "Invalid IP address"
-  //     : undefined;
-  //   const required = this.otpServerIp ? undefined : "Required";
-  //   this.serverIpError = required
-  //     ? required
-  //     : ipAddress;
-  // }
+  @action
+  validateServerIp() {
+    const ipAddress = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/i.test(this.password)
+      ? "Invalid IP address"
+      : undefined;
+    const required = this.otpServerIp ? undefined : "Required";
+    this.serverIpError = required
+      ? required
+      : ipAddress;
+  }
 
   @action
   serverPortOnChange(port) {
     this.otpServerPort = port;
-    // this.validateServerPort();
+    this.validateServerPort();
   }
 
-  // @action
-  // validateServerPort() {
-  //   const numberic = /^0|[1-9]\d*$/i.test(this.password)
-  //     ? "Only number"
-  //     : undefined;
-  //   const required = this.otpServerPort ? undefined : "Required";
-  //   this.serverPortError = required
-  //     ? required
-  //     : numberic;
-  // }
+  @action
+  validateServerPort() {
+    const numberic = /^0|[1-9]\d*$/i.test(this.password)
+      ? "Only number"
+      : undefined;
+    const required = this.otpServerPort ? undefined : "Required";
+    this.serverPortError = required
+      ? required
+      : numberic;
+  }
 
   @action
   validateForm() {
-    // if (this.serverIpError === undefined && this.serverPortError === undefined) {
-    //   this.isValid = true;
-    // }
-    this.isValid = true;
+    if (this.serverIpError === undefined && this.serverPortError === undefined) {
+      this.isValid = true;
+    }
+  }
+
+  @action
+  async saveOtpServerBasicInfo(encKey) {
+    try{
+      await AsyncStorage.setItem('@ApiKeysStore:otpServerIp', this.otpServerIp);
+      await AsyncStorage.setItem('@ApiKeysStore:otpServerPort', this.otpServerPort);
+      await AsyncStorage.setItem('@ApiKeysStore:encKey', encKey || this.encKey);
+
+
+    } catch(e) {
+      console.log(e);
+    }
   }
 
   @action

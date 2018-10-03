@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "36368506036",
+    "firebase_url": "https://seedauth-fe6f7.firebaseio.com",
+    "project_id": "seedauth-fe6f7",
+    "storage_bucket": "seedauth-fe6f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36368506036:android:4a9aeee4a43ccc48",
+        "android_client_info": {
+          "package_name": "net.dfocus.seedauth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "36368506036-rhpsij7lcev5573diistlj808nkkiq5f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-WYHywSUrHL-Bd1Q2GSAd1mU9drVEe5o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

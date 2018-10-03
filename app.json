@@ -1,7 +1,6 @@
 {
   "expo": {
     "sdkVersion": "24.0.0",
-    "slug": "SeedAuthMobile",
     "loading": {
       "hideExponentText": false,
       "icon": "./assets/seedauth-icon.png"
@@ -15,6 +14,19 @@
     "androidStatusBar": {
       "barStyle": "light-content",
       "backgroundColor": "#334393"
+    },
+    "name": "SeedAuth",
+    "icon": "./assets/seedauth-icon-512.png",
+    "version": "1.0.3",
+    "slug": "seedauth-mobile",
+    "ios": {
+      "bundleIdentifier": "net.dfocus.seedauth",
+      "icon": "./assets/SeedIcon-IOS.png"
+    },
+    "android": {
+      "package": "net.dfocus.seedauth",
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 3
     }
   }
 }
