@@ -8,7 +8,9 @@
     "orientation": "portrait",
     "primaryColor": "#cccccc",
     "packagerOpts": {
-      "assetExts": ["ttf"]
+      "assetExts": [
+        "ttf"
+      ]
     },
     "androidStatusBarColor": "#334393",
     "androidStatusBar": {
@@ -27,6 +29,7 @@
       "package": "net.dfocus.seedauth",
       "googleServicesFile": "./google-services.json",
       "versionCode": 3
-    }
+    },
+    "description": ""
   }
 }
