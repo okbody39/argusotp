@@ -41,9 +41,12 @@ class MainStore {
 
       this.userToken = userToken;
 
-      if (this.userToken.length > 0) {
+      // TODO: IOS Login시 한번 실패하는 현상???
+      // if (this.userToken.length > 0) {
+      if (this.userToken) {
         this.isLogin = true;
       }
+
     } catch (e) {
       console.log(e);
     }
