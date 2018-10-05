@@ -2,7 +2,7 @@
   "expo": {
     "sdkVersion": "24.0.0",
     "loading": {
-      "hideExponentText": false,
+      "hideExponentText": true,
       "icon": "./assets/seedauth-icon.png"
     },
     "orientation": "portrait",
@@ -19,16 +19,59 @@
     },
     "name": "SeedAuth",
     "icon": "./assets/seedauth-icon-512.png",
-    "version": "1.0.3",
     "slug": "seedauth-mobile",
     "ios": {
       "bundleIdentifier": "net.dfocus.seedauth",
-      "icon": "./assets/SeedIcon-IOS.png"
+      "supportsTablet": false,
+      "isTabletOnly": false,
+      "usesIcloudStorage": false,
+      "splash": {
+        "backgroundColor": "#ffffff",
+        "resizeMode": "contain",
+        "image": "./assets/seed-splash.png"
+      },
+      "icon": "./assets/SeedIcon-IOS.png",
+      "buildNumber": "5"
     },
     "android": {
       "package": "net.dfocus.seedauth",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 3
+      "icon": "./assets/seedauth-icon.png",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "com.android.launcher.permission.INSTALL_SHORTCUT",
+        "com.google.android.c2dm.permission.RECEIVE",
+        "com.htc.launcher.permission.UPDATE_SHORTCUT",
+        "com.majeur.launcher.permission.UPDATE_BADGE",
+        "com.sec.android.provider.badge.permission.READ",
+        "com.sec.android.provider.badge.permission.WRITE",
+        "com.sonyericsson.home.permission.BROADCAST_BADGE"
+      ],
+      "splash": {
+        "backgroundColor": "#ffffff",
+        "resizeMode": "contain",
+        "ldpi": "./assets/seed-splash.png",
+        "mdpi": "./assets/seed-splash.png",
+        "hdpi": "./assets/seed-splash.png",
+        "xhdpi": "./assets/seed-splash.png",
+        "xxhdpi": "./assets/seed-splash.png",
+        "xxxhdpi": "./assets/seed-splash.png"
+      },
+      "versionCode": 5
+    },
+    "version": "1.0.5",
+    "splash": {
+      "backgroundColor": "#ffffff",
+      "resizeMode": "contain",
+      "image": "./assets/seed-splash.png"
+    },
+    "notification": {
+      "icon": "./assets/seedauth-icon-512.png",
+      "color": "#ffffff",
+      "androidMode": "collapse",
+      "androidCollapsedTitle": "SeedAuth"
     },
     "description": ""
   }
