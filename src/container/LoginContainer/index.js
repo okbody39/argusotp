@@ -149,7 +149,7 @@ export default class LoginContainer extends React.Component<Props, State> {
 
           setTimeout(() => {
             navigation.navigate("AuthLoading");
-          }, 500);
+          }, 1000);
           // navigation.navigate("Drawer");
 
         } else {
