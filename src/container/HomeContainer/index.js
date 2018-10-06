@@ -3,7 +3,7 @@ import * as React from "react";
 import { observer, inject } from "mobx-react/native";
 
 import Home from "../../stories/screens/Home";
-import data from "./data";
+// import data from "./data";
 import OTP from "otp-client";
 import styles from "../../stories/screens/VMs/styles";
 import {
@@ -30,7 +30,7 @@ export interface Props {
 export interface State {}
 
 // @inject("mainStore")
-@inject("loginForm", "settingForm")
+@inject("mainStore")
 @observer
 export default class HomeContainer extends React.Component<Props, State> {
 
@@ -43,19 +43,19 @@ export default class HomeContainer extends React.Component<Props, State> {
   _bootstrapAsync = async () => {
     const { loginForm, settingForm } = this.props;
 
-    await loginForm.loadUserAuthInfo();
-    await settingForm.loadOtpServerInfo();
+    // loginForm.loadUserAuthInfo();
+    // settingForm.loadOtpServerInfo();
 
     // console.log('HomeContainer....', loginForm.userId);
-    // const userToken = await loginForm.checkUserAuthInfo();
+    // const userToken = loginForm.checkUserAuthInfo();
 
   };
 
   render() {
-    const { loginForm, navigation, settingForm } = this.props;
+    const { mainStore, navigation } = this.props;
 
     // const list = this.props.mainStore.items.toJS();
-    return <Home navigation={navigation} userId={loginForm.userId} settingForm={settingForm} />;
+    return <Home navigation={navigation} mainStore={mainStore} />;
 
 
   }

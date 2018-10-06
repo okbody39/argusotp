@@ -34,7 +34,7 @@ class ServerInfo extends React.Component<Props, State> {
   }
 
 	render() {
-    const { navigation, settingForm, loginForm } = this.props;
+    const { navigation, mainStore } = this.props;
 
 		return (
 			<Container>
@@ -63,7 +63,7 @@ class ServerInfo extends React.Component<Props, State> {
                 <Text>ID</Text>
                 </Body>
                 <Right style={{ flex: 1 }}>
-                  <Text note>{loginForm.userId}</Text>
+                  <Text note>{mainStore.userToken.userId}</Text>
                 </Right>
               </ListItem>
               <ListItem itemDivider>
@@ -74,7 +74,7 @@ class ServerInfo extends React.Component<Props, State> {
                   <Text>IP</Text>
                 </Body>
                 <Right style={{ flex: 1 }}>
-                  <Text note>{settingForm.otpServerIp}</Text>
+                  <Text note>{mainStore.serverToken.otpServerIp}</Text>
                 </Right>
               </ListItem>
               <ListItem>
@@ -82,7 +82,7 @@ class ServerInfo extends React.Component<Props, State> {
                   <Text>Port</Text>
                 </Body>
                 <Right style={{ flex: 1 }}>
-                  <Text note>{settingForm.otpServerPort}</Text>
+                  <Text note>{mainStore.serverToken.otpServerPort}</Text>
                 </Right>
               </ListItem>
               {/*<ListItem>*/}
@@ -98,7 +98,7 @@ class ServerInfo extends React.Component<Props, State> {
                 <Text>Period</Text>
                 </Body>
                 <Right style={{ flex: 1 }}>
-                  <Text note>{settingForm.period}</Text>
+                  <Text note>{mainStore.serverToken.period}</Text>
                 </Right>
               </ListItem>
               <ListItem>
@@ -106,7 +106,7 @@ class ServerInfo extends React.Component<Props, State> {
                 <Text>Digits</Text>
                 </Body>
                 <Right style={{ flex: 1 }}>
-                  <Text note>{settingForm.digits}</Text>
+                  <Text note>{mainStore.serverToken.digits}</Text>
                 </Right>
               </ListItem>
             </List>

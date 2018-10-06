@@ -1,4 +1,3 @@
-// @flow
 import * as React from "react";
 import Sidebar from "../../stories/screens/Sidebar";
 export interface Props {

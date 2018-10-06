@@ -2,49 +2,37 @@ import { observable, action } from "mobx";
 import { AsyncStorage } from "react-native";
 
 class MainStore {
-  @observable hasErrored = false;
-  @observable isLoading = true;
-  @observable items = [];
-
-  @observable userToken = "";
+  @observable userToken = {};
+  @observable serverToken = {};
   @observable isLogin = false;
-
-  @observable pushToken = "";
-
-  @observable otpServerIp = "";
-  @observable otpServerPort = "";
-  @observable encKey = "";
-  @observable period = "";
-  @observable digits = "";
+  @observable isServerSet = false;
 
   @action
-  fetchItems(data) {
-    this.items = data;
-    this.isLoading = false;
+  getServerUrl() {
+    let url = "http://" + this.serverToken.otpServerIp + ":" + this.serverToken.otpServerPort;
+    return url;
   }
 
   @action
-  saveUserToken(data, isLogin) {
-    this.userToken = data;
-    this.isLogin = isLogin;
-  }
-
-  @action
-  setPushToken(data) {
-    this.pushToken = data;
-  }
-
-  @action
-  async loadUserToken() {
+  async loadStore() {
     try {
-      let userToken = await AsyncStorage.getItem("@ApiKeysStore:userId");
+      this.isLogin = false;
+      this.isServerSet = false;
 
-      this.userToken = userToken;
+      let userToken = await AsyncStorage.getItem("@SeedAuthStore:userToken");
+      let serverToken = await AsyncStorage.getItem("@SeedAuthStore:serverToken");
 
-      // TODO: IOS Login시 한번 실패하는 현상???
-      // if (this.userToken.length > 0) {
-      if (this.userToken) {
+      this.userToken = JSON.parse(userToken);
+      this.serverToken = JSON.parse(serverToken);
+
+      // console.log(this.userToken, this.serverToken);
+
+      if (this.userToken && this.userToken.userId.length > 0) {
         this.isLogin = true;
+      }
+
+      if (this.serverToken && this.serverToken.encKey.length > 0) {
+        this.isServerSet = true;
       }
 
     } catch (e) {
@@ -53,25 +41,86 @@ class MainStore {
   }
 
   @action
-  saveOtpServerInfo(ip, port, key) {
-    this.otpServerIp = ip;
-    this.otpServerPort = port;
-    this.encKey = port;
-  }
-
-  @action
-  async loadOtpServerInfo() {
+  async saveStore(_userToken, _serverToken) {
     try {
-      this.otpServerIp = await AsyncStorage.getItem("@ApiKeysStore:otpServerIp");
-      this.otpServerPort = await AsyncStorage.getItem("@ApiKeysStore:otpServerPort");
-      this.encKey = await AsyncStorage.getItem("@ApiKeysStore:encKey");
-      this.period = await AsyncStorage.getItem("@ApiKeysStore:period");
-      this.digits = await AsyncStorage.getItem("@ApiKeysStore:digits");
+      await this.saveUserStore(_userToken);
+      await this.saveServerStore(_serverToken);
     } catch (e) {
       console.log(e);
     }
   }
 
+  @action
+  async saveUserStore(_userToken) {
+    try {
+      let userToken = _userToken || JSON.stringify(this.userToken);
+
+      if (typeof _userToken === "object") {
+        userToken = JSON.stringify(_userToken);
+      }
+
+      await AsyncStorage.setItem("@SeedAuthStore:userToken", userToken);
+      this.userToken = JSON.parse(userToken);
+      this.isLogin = true;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  @action
+  async saveServerStore(_serverToken) {
+    try {
+      let serverToken = _serverToken || JSON.stringify(this.serverToken);
+
+      if (typeof _serverToken === "object") {
+        serverToken = JSON.stringify(_serverToken);
+      }
+
+      // console.log(serverToken);
+
+      await AsyncStorage.setItem("@SeedAuthStore:serverToken", serverToken);
+      this.serverToken = JSON.parse(serverToken);
+      this.isServerSet = true;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  @action
+  async resetStore() {
+    try {
+      await AsyncStorage.removeItem("@SeedAuthStore:userToken");
+      await AsyncStorage.removeItem("@SeedAuthStore:serverToken");
+      this.userToken = {};
+      this.serverToken = {};
+      this.isLogin = false;
+      this.isServerSet = false;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  @action
+  async resetUserStore() {
+    try {
+      await AsyncStorage.removeItem("@SeedAuthStore:userToken");
+      this.userToken = {};
+      this.isLogin = false;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  // @action
+  // async resetServerStore() {
+  //   try {
+  //     await AsyncStorage.removeItem("@SeedAuthStore:serverToken");
+  //     this.serverToken = {};
+  //     this.isServerSet = false;
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 }
 
 export default MainStore;

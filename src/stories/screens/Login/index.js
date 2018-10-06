@@ -43,7 +43,10 @@ class Login extends React.Component<Props, State> {
 								<Text>Login</Text>
 							</Button>
 					</View>
-					<View padder>
+					<View padder style={{ alignItems: "center" }}>
+						<Text note style={{ marginBottom: 10 }}>
+              This service need setting the server first.
+						</Text>
 						<Button block info onPress={() => this.props.navigation.navigate("PreSetting")}>
 							<Text>Setting</Text>
 						</Button>

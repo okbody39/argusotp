@@ -7,52 +7,13 @@ class LoginStore {
   @observable isValid = false;
   @observable userIdError = "";
   @observable passwordError = "";
-  @observable otpKey = "";
 
-  @action async saveUserAuthInfo() {
-    try{
-      await AsyncStorage.setItem('@ApiKeysStore:userId', this.userId);
-      await AsyncStorage.setItem('@ApiKeysStore:userPassword', this.password);
-    } catch(e) {
-      console.log(e);
-    }
-  }
+  @observable userToken = {
+    userId: "",
+    password: "",
+    pushToken: "",
+  };
 
-  @action async checkUserAuthInfo() {
-    try{
-      //TODO: encryption
-      let userToken = await AsyncStorage.getItem('@ApiKeysStore:userId');
-      return userToken.toString();
-    } catch(e) {
-      // console.log(e);
-      return null;
-    }
-  }
-
-  @action async resetUserAuthInfo() {
-    try{
-      this.userId = "";
-      this.isValid = false;
-      this.userIdError = "";
-      this.password = "";
-      this.passwordError = "";
-      this.otpKey = "";
-
-      await AsyncStorage.removeItem('@ApiKeysStore:userId');
-      await AsyncStorage.removeItem('@ApiKeysStore:userPassword');
-    } catch(e) {
-      console.log(e);
-    }
-  }
-
-  @action async loadUserAuthInfo() {
-    try {
-      this.userId = await AsyncStorage.getItem('@ApiKeysStore:userId');
-      this.password = await AsyncStorage.getItem('@ApiKeysStore:userPassword');
-    } catch (e) {
-      console.log(e);
-    }
-  }
 
   @action
   userIdOnChange(id) {
@@ -124,6 +85,17 @@ class LoginStore {
     if (this.userIdError === undefined && this.passwordError === undefined) {
       this.isValid = true;
     }
+  }
+
+  @action
+  setUserInfo(userId, password) {
+    this.userToken.userId = userId || this.userId;
+    this.userToken.password = password || this.password;
+  }
+
+  @action
+  setPushInfo(pushToken) {
+    this.userToken.pushToken = pushToken;
   }
 
   @action

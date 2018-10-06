@@ -16,7 +16,7 @@ export interface Props {
 }
 export interface State {}
 
-@inject("settingForm", "loginForm", "mainStore")
+@inject("loginForm", "mainStore")
 @observer
 export default class LoginContainer extends React.Component<Props, State> {
   userIdInput: any;
@@ -45,24 +45,24 @@ export default class LoginContainer extends React.Component<Props, State> {
     }
 
     let token = await Notifications.getExpoPushTokenAsync();
-    mainStore.setPushToken(token);
+
+
+    loginForm.setPushInfo(token);
 
   };
 
-  async componentWillMount() {
-    const { loginForm, settingForm, navigation, mainStore } = this.props;
-
+  componentWillMount() {
+    const { loginForm, navigation, mainStore } = this.props;
     let isLogout = navigation.state.params ? navigation.state.params.isLogout : false;
 
+    loginForm.clearStore();
+
     if (isLogout) {
-      await loginForm.resetUserAuthInfo();
-      await mainStore.saveUserToken({}, false);
-      // await settingForm.resetOtpServerInfo();
+      mainStore.resetUserStore();
+      return;
     }
 
-    await settingForm.loadOtpServerInfo();
-
-    if (!settingForm.encKey) {
+    if (!mainStore.isServerSet) {
       Toast.show({
         text: "Please setting your server first",
         duration: 2000,
@@ -73,15 +73,24 @@ export default class LoginContainer extends React.Component<Props, State> {
       return;
     }
 
-    await loginForm.loadUserAuthInfo();
-
     if (mainStore.isLogin) {
       navigation.navigate("Drawer");
     }
   }
 
   login() {
-    const { loginForm, settingForm, navigation, mainStore } = this.props;
+    const { loginForm, navigation, mainStore } = this.props;
+
+    if (!mainStore.isServerSet) {
+      Toast.show({
+        text: "Please setting your server first",
+        duration: 2000,
+        position: "top",
+        textStyle: { textAlign: "center" },
+      });
+
+      return;
+    }
 
     loginForm.validateForm();
 
@@ -90,35 +99,38 @@ export default class LoginContainer extends React.Component<Props, State> {
       const formPayload = {
         userid: loginForm.userId,
         userpassword: loginForm.password,
-        pushToken: mainStore.pushToken,
+        pushToken: loginForm.userToken.pushToken,
         code: "",
       };
 
-      var encryptedHex = encrypt(JSON.stringify(formPayload), settingForm.encKey);
+      var encryptedHex = encrypt(JSON.stringify(formPayload), mainStore.serverToken.encKey);
 
-      axios.get("http://" + settingForm.otpServerIp + ":" + settingForm.otpServerPort + "/otp/register/" + encryptedHex, {
+      axios.get(mainStore.getServerUrl() + "/otp/register/" + encryptedHex, {
         crossdomain: true,
       }).then(res => {
         const result = res.data;
 
-        let jsonText = decrypt(result, settingForm.encKey);
+        let jsonText = decrypt(result, mainStore.serverToken.encKey);
         let jsonObj = JSON.parse(jsonText);
 
         if (jsonObj.result === "True") {
 
-          settingForm.setOtpInfo(jsonObj.reason, jsonObj.period, jsonObj.digits);
+          loginForm.userToken.userId = loginForm.userId;
+          loginForm.userToken.password = loginForm.password;
 
-          loginForm.saveUserAuthInfo();
-          // mainStore.saveUserToken(loginForm.userId, true);
-          settingForm.saveOtpServerInfo();
+          mainStore.serverToken.otpKey = jsonObj.reason;
+          mainStore.serverToken.period = jsonObj.period;
+          mainStore.serverToken.digits = jsonObj.digits;
 
-          setTimeout(() => {
-            navigation.navigate("AuthLoading");
-          }, 500);
+          mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
+            // setTimeout(() => {
+              navigation.navigate("AuthLoading");
+            // }, 500);
+          });
 
         } else {
-          loginForm.resetUserAuthInfo();
-          mainStore.saveUserToken({}, false);
+          loginForm.clearStore();
+          mainStore.resetUserStore();
 
           Toast.show({
             text: jsonObj.reason,
@@ -149,6 +161,7 @@ export default class LoginContainer extends React.Component<Props, State> {
           <Icon active name="person" />
           <Input
             placeholder="User ID"
+            placeholderTextColor="#c9c9c9"
             keyboardType="email-address"
             autoCapitalize = "none"
             ref={c => (this.userIdInput = c)}
@@ -161,6 +174,7 @@ export default class LoginContainer extends React.Component<Props, State> {
           <Icon active name="unlock" />
           <Input
             placeholder="Password"
+            placeholderTextColor="#c9c9c9"
             autoCapitalize = "none"
             ref={c => (this.pwdinput = c)}
             value={form.password}

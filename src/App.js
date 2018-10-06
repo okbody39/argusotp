@@ -1,4 +1,3 @@
-// @flow
 import React from "react";
 import { StackNavigator, DrawerNavigator, SwitchNavigator, createStackNavigator, createSwitchNavigator } from "react-navigation";
 import { Root } from "native-base";

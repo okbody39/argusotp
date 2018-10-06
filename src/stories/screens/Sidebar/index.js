@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Alert } from "react-native";
+import { Alert, Image } from "react-native";
 import { Text, Container, List, ListItem, Content } from "native-base";
 import { NavigationActions } from "react-navigation";
 
@@ -55,8 +55,12 @@ export default class Sidebar extends React.Component<Props, State> {
 		return (
 			<Container>
 				<Content>
+          <Image
+            source={require("../../../../assets/logo-seedauth.png")}
+            style={{width: 600 / 4, height: 172 / 4,  marginTop: 10, marginLeft: 10}}
+          />
 					<List
-						style={{ marginTop: 40 }}
+						style={{ marginTop: 10 }}
 						dataArray={routes}
 						renderRow={data => {
 							return (

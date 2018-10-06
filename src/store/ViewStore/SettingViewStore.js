@@ -1,5 +1,5 @@
 import { observable, action } from "mobx";
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage } from "react-native";
 
 class SettingStore {
   @observable otpServerIp = "";
@@ -13,53 +13,25 @@ class SettingStore {
   @observable period = "";
   @observable digits = "";
 
+  @observable serverToken = {
+    otpServerIp: "",
+    otpServerPort: "",
+    encKey: "",
+    otpKey: "",
+    period: "60",
+    digits: "6",
+  };
 
-  @action async saveOtpServerInfo() {
-    try{
-      await AsyncStorage.setItem('@ApiKeysStore:otpServerIp', this.otpServerIp);
-      await AsyncStorage.setItem('@ApiKeysStore:otpServerPort', this.otpServerPort);
-      await AsyncStorage.setItem('@ApiKeysStore:encKey', this.encKey);
-      await AsyncStorage.setItem('@ApiKeysStore:otpKey', this.otpKey);
-
-      await AsyncStorage.setItem('@ApiKeysStore:period', this.period);
-      await AsyncStorage.setItem('@ApiKeysStore:digits', this.digits);
-
-    } catch(e) {
-      console.log(e);
-    }
+  @action
+  getServerUrl() {
+    let url = "http://" + this.otpServerIp + ":" + this.otpServerPort;
+    return url;
   }
 
-  @action async resetOtpServerInfo() {
-    try{
-      this.otpServerIp = "";
-      this.otpServerPort = "";
-      this.encKey = "";
-
-      await AsyncStorage.removeItem('@ApiKeysStore:otpServerIp');
-      await AsyncStorage.removeItem('@ApiKeysStore:otpServerPort');
-      await AsyncStorage.removeItem('@ApiKeysStore:encKey');
-      await AsyncStorage.removeItem('@ApiKeysStore:otpKey');
-
-      await AsyncStorage.removeItem('@ApiKeysStore:period');
-      await AsyncStorage.removeItem('@ApiKeysStore:digits');
-
-    } catch(e) {
-      console.log(e);
-    }
-  }
-
-  @action async loadOtpServerInfo() {
-    try {
-      this.otpServerIp = await AsyncStorage.getItem('@ApiKeysStore:otpServerIp');
-      this.otpServerPort = await AsyncStorage.getItem('@ApiKeysStore:otpServerPort');
-      this.encKey = await AsyncStorage.getItem('@ApiKeysStore:encKey');
-      this.otpKey = await AsyncStorage.getItem('@ApiKeysStore:otpKey');
-
-      this.period = await AsyncStorage.getItem('@ApiKeysStore:period');
-      this.digits = await AsyncStorage.getItem('@ApiKeysStore:digits');
-    } catch (e) {
-      console.log(e);
-    }
+  @action
+  loadServerInfo(serverToken) {
+    this.otpServerIp = serverToken.otpServerIp;
+    this.otpServerPort = serverToken.otpServerPort;
   }
 
   @action
@@ -104,23 +76,17 @@ class SettingStore {
   }
 
   @action
-  async saveOtpServerBasicInfo(encKey) {
-    try{
-      await AsyncStorage.setItem('@ApiKeysStore:otpServerIp', this.otpServerIp);
-      await AsyncStorage.setItem('@ApiKeysStore:otpServerPort', this.otpServerPort);
-      await AsyncStorage.setItem('@ApiKeysStore:encKey', encKey || this.encKey);
-
-
-    } catch(e) {
-      console.log(e);
-    }
+  setServerInfo(otpServerIp, otpServerPort, encKey) {
+    this.serverToken.otpServerIp = otpServerIp;
+    this.serverToken.otpServerPort = otpServerPort;
+    this.serverToken.encKey = encKey;
   }
 
   @action
   setOtpInfo(otpKey, period, digits) {
-    this.otpKey = otpKey;
-    this.period = "" + period;
-    this.digits = "" + digits;
+    this.serverToken.otpKey = otpKey;
+    this.serverToken.period = "" + period;
+    this.serverToken.digits = "" + digits;
   }
 
   @action
@@ -131,6 +97,9 @@ class SettingStore {
     this.otpKey = "";
     this.period = "";
     this.digits = "";
+    this.serverIpError = "";
+    this.serverPortError = "";
+
     this.isValid = false;
   }
 }

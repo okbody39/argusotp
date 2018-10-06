@@ -16,51 +16,44 @@ export interface State {}
 
 const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 
-@inject("settingForm")
+@inject("settingForm", "mainStore")
 @observer
 export default class SettingContainer extends React.Component<Props, State> {
   serverIpInput: any;
   serverPortInput: any;
 
-  async componentDidMount() {
-    const { settingForm } = this.props;
+  componentDidMount() {
+    const { settingForm, mainStore } = this.props;
 
-    await settingForm.loadOtpServerInfo();
-
+    if(mainStore.serverToken) {
+      settingForm.loadServerInfo(mainStore.serverToken);
+    }
   }
 
   save() {
-    const { settingForm, navigation } = this.props;
+    const { settingForm, mainStore, navigation } = this.props;
 
     settingForm.validateServerIp();
     settingForm.validateServerPort();
-
     settingForm.validateForm();
 
     if (settingForm.isValid) {
 
-      axios.get("http://" + settingForm.otpServerIp + ":" + settingForm.otpServerPort + "/otp/encryptKey", {
+      axios.get(settingForm.getServerUrl() + "/otp/encryptKey", {
         crossdomain: true,
       }).then(res => {
         const result = res.data;
-
-        // var key = aesjs.utils.utf8.toBytes(_DEFAULT_KEY_);
-        // var aesEcb = new aesjs.ModeOfOperation.ecb(key);
-        //
-        // let encryptedBytes = aesjs.utils.hex.toBytes(result);
-        // let decryptedBytes = aesEcb.decrypt(encryptedBytes);
-        // let decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
-        //
-        // // 중요 : 절대 삭제하지 말것!!!
-        // let jsonText = decryptedText.substring(0, decryptedText.indexOf("}") + 1);
-
         let jsonText = decrypt(result, _DEFAULT_KEY_);
 
         let jsonObj = JSON.parse(jsonText);
 
-        settingForm.saveOtpServerBasicInfo(jsonObj.encKey);
+        settingForm.serverToken.otpServerIp = settingForm.otpServerIp;
+        settingForm.serverToken.otpServerPort = settingForm.otpServerPort;
+        settingForm.serverToken.encKey = jsonObj.encKey;
 
-        navigation.goBack();
+        mainStore.saveServerStore(settingForm.serverToken).then(() => {
+          navigation.goBack();
+        });
 
       }).catch(err => {
         Toast.show({
@@ -88,8 +81,9 @@ export default class SettingContainer extends React.Component<Props, State> {
         <Item error={settingForm.serverIpError ? true : false}>
           <Icon active name="person" />
           <Input
-            placeholder="OTP Server IP"
-            keyboardType="default"
+            placeholder="Server IP"
+            placeholderTextColor="#c9c9c9"
+            keyboardType="numeric"
             value={settingForm.otpServerIp}
             onChangeText={e => settingForm.serverIpOnChange(e)}
           />
@@ -97,7 +91,9 @@ export default class SettingContainer extends React.Component<Props, State> {
         <Item error={settingForm.serverPortError ? true : false}>
           <Icon active name="unlock" />
           <Input
-            placeholder="OTP Server Port"
+            placeholder="Server Port"
+            placeholderTextColor="#c9c9c9"
+            keyboardType="numeric"
             value={settingForm.otpServerPort}
             onChangeText={e => settingForm.serverPortOnChange(e)}
           />

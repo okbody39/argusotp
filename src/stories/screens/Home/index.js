@@ -34,9 +34,6 @@ class Home extends React.Component<Props, State> {
       nextTokenSecond: 0,
       subTitle: this.props.userId,
       intervalId: null,
-      // otpKey: this.props.settingForm.otpKey,
-      // period: this.props.settingForm.period, //60,
-      // digits: this.props.settingForm.digits,
       textColor: "#3b5998",
       progress: 0,
     };
@@ -69,28 +66,28 @@ class Home extends React.Component<Props, State> {
 
     let intervalId = setInterval(() => {
 
-      const { settingForm } = this.props;
+      const { mainStore } = this.props;
 
       // console.log(settingForm);
 
-      if (!settingForm.otpKey) {
+      if (!mainStore.isServerSet) {
         return;
       }
 
       var options = {
         algorithm: "sha1",
-        digits: parseInt(settingForm.digits),
-        period: parseInt(settingForm.period),
+        digits: parseInt(mainStore.serverToken.digits),
+        period: parseInt(mainStore.serverToken.period),
         epoch: null
       };
 
-      const otp = new OTP(this.props.userId + settingForm.otpKey, options);
+      const otp = new OTP(mainStore.userToken.userId + mainStore.serverToken.otpKey, options);
       const token = otp.getToken();
       const prevToken = otp.getToken(-1);
       const nextToken = otp.getToken(1);
 
       let timeLeft = otp.getTimeUntilNextTick() + 1;
-      let progress = (settingForm.period - timeLeft) / settingForm.period;
+      let progress = (options.period - timeLeft) / options.period;
 
       this.setState({
         token: token,
