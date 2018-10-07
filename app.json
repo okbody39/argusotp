@@ -1,6 +1,6 @@
 {
   "expo": {
-    "sdkVersion": "24.0.0",
+    "sdkVersion": "30.0.0",
     "loading": {
       "hideExponentText": true,
       "icon": "./assets/seedauth-icon.png"
@@ -22,6 +22,9 @@
     "slug": "seedauth-mobile",
     "ios": {
       "bundleIdentifier": "net.dfocus.seedauth",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "This app will use Face ID or Touch ID to authorize."
+      },
       "supportsTablet": false,
       "isTabletOnly": false,
       "usesIcloudStorage": false,

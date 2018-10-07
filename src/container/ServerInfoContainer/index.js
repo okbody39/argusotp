@@ -5,6 +5,7 @@ import { observer, inject } from "mobx-react/native";
 // import aesjs from "aes-js";
 // import axios from "axios";
 import { AsyncStorage } from "react-native";
+import Expo, { Constants } from "expo";
 
 import ServerInfo from "../../stories/screens/ServerInfo";
 
@@ -20,9 +21,20 @@ export default class ServerInfoContainer extends React.Component<Props, State> {
   serverIpInput: any;
   serverPortInput: any;
 
-  componentDidMount() {
-    // const { settingForm, loginForm } = this.props;
+  constructor(props, context) {
+    super(props, context);
+    this.state = {
+      version: "",
+    };
 
+  }
+
+  componentDidMount() {
+    const {version} = Expo.Constants.manifest;
+
+    this.setState({
+      version: version
+    });
   }
 
   render() {
@@ -32,6 +44,6 @@ export default class ServerInfoContainer extends React.Component<Props, State> {
     	return <Spinner/>;
 		}
 
-    return <ServerInfo navigation={navigation} mainStore={mainStore} />;
+    return <ServerInfo navigation={navigation} mainStore={mainStore} ver={this.state.version}/>;
   }
 }

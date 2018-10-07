@@ -10,6 +10,8 @@ import axios from "axios";
 import {inject, observer} from "mobx-react/native";
 import {NavigationActions} from "react-navigation";
 import {decrypt} from "../../utils/crypt";
+import Expo, { Constants } from "expo";
+
 export interface Props {
 	navigation: any,
 }
@@ -26,10 +28,19 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
   _bootstrapAsync = async () => {
     const { mainStore } = this.props;
 
+    // let compatible = await Expo.LocalAuthentication.hasHardwareAsync();
+    // let fingerprints = await Expo.LocalAuthentication.isEnrolledAsync();
+    //
+    // console.log(compatible, fingerprints);
+    //
+    // if(fingerprints) {
+    //   let result = await Expo.LocalAuthentication.authenticateAsync('Scan your finger.');
+    // }
+
     mainStore.loadStore().then(() => {
       var routName = mainStore.isLogin ? "App" : "Auth";
 
-      if(mainStore.isServerSet) {
+      if (mainStore.isServerSet) {
         axios.get(mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId, {
           crossdomain: true,
         }).then(res => {

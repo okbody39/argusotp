@@ -4,13 +4,15 @@ import { Container, Header, Title, Content, Text, Button, Icon, Left, Right, Bod
 
 import styles from "./styles";
 // import {Image} from "../Login";
+// import pkg from "package";
+
 export interface Props {
 	navigation: any;
 }
 export interface State {}
 class BlankPage extends React.Component<Props, State> {
 	render() {
-		const param = this.props.navigation.state.params;
+		const {ver} = this.props;
 		return (
 			<Container style={styles.container}>
 				<Header>
@@ -39,16 +41,23 @@ class BlankPage extends React.Component<Props, State> {
                 SeedAuth Mobile is Mobile OTP(One-time password) App for SeedCloud and SeedVDI.
               </Text>
               </Body>
+
             </CardItem>
             <CardItem>
               <Row>
-                <Left/>
                 <Right style={{flex: 3}}>
                   <Text note>Copyright 2018 DFOCUS Inc.</Text>
                 </Right>
               </Row>
             </CardItem>
           </Card>
+          <Row>
+          <Right>
+            <Text note style={{marginRight: 10}}>
+              v{ver}
+            </Text>
+          </Right>
+          </Row>
 				</Content>
 			</Container>
 		);

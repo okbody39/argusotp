@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Container, Header, Title, Content, Text, Button, Icon, Left, Right, Body, List, ListItem, H1, Card, CardItem, View } from "native-base";
+import { Container, Header, Title, Content, Text, Button, Icon, Row, Left, Right, Body, List, ListItem, H1, Card, CardItem, View } from "native-base";
 import Sparkline from 'react-native-sparkline';
 import axios from 'axios';
 import OTP from 'otp-client';
@@ -34,7 +34,7 @@ class ServerInfo extends React.Component<Props, State> {
   }
 
 	render() {
-    const { navigation, mainStore } = this.props;
+    const { navigation, mainStore, ver } = this.props;
 
 		return (
 			<Container>
@@ -107,6 +107,17 @@ class ServerInfo extends React.Component<Props, State> {
                 </Body>
                 <Right style={{ flex: 1 }}>
                   <Text note>{mainStore.serverToken.digits}</Text>
+                </Right>
+              </ListItem>
+              <ListItem itemDivider>
+                <Text>App Information</Text>
+              </ListItem>
+              <ListItem>
+                <Body>
+                <Text>Version</Text>
+                </Body>
+                <Right style={{ flex: 1 }}>
+                  <Text note>v{ver}</Text>
                 </Right>
               </ListItem>
             </List>
