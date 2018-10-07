@@ -49,7 +49,11 @@ class ServerInfo extends React.Component<Props, State> {
 						<Title>Detail Inform.</Title>
 					</Body>
 
-					<Right />
+					<Right>
+            <Button transparent onPress={() => this.props.navigation.navigate("Setting")}>
+              <Icon name="ios-cog" style={{fontSize: 30}}/>
+            </Button>
+          </Right>
 				</Header>
 
         <Content padder>
@@ -122,11 +126,11 @@ class ServerInfo extends React.Component<Props, State> {
               </ListItem>
             </List>
           </Card>
-          <View padder>
-            <Button block info onPress={() => this.props.navigation.navigate("Setting")}>
-              <Text>Server Setting</Text>
-            </Button>
-          </View>
+          {/*<View padder>*/}
+            {/*<Button block info onPress={() => this.props.navigation.navigate("Setting")}>*/}
+              {/*<Text>Server Setting</Text>*/}
+            {/*</Button>*/}
+          {/*</View>*/}
 				</Content>
 			</Container>
 		);
