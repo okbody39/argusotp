@@ -7,6 +7,7 @@ import { AsyncStorage } from "react-native";
 
 import { encrypt, decrypt} from "../../utils/crypt";
 import Setting from "../../stories/screens/Setting";
+import {NavigationActions} from "react-navigation";
 
 export interface Props {
   navigation: any,
@@ -15,6 +16,10 @@ export interface Props {
 export interface State {}
 
 const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
+const resetAction = NavigationActions.reset({
+  index: 0,
+  actions: [NavigationActions.navigate({ routeName: "Login", params: { isLogout: true }})],
+});
 
 @inject("settingForm", "mainStore")
 @observer
@@ -51,8 +56,20 @@ export default class SettingContainer extends React.Component<Props, State> {
         settingForm.serverToken.otpServerPort = settingForm.otpServerPort;
         settingForm.serverToken.encKey = jsonObj.encKey;
 
-        mainStore.saveServerStore(settingForm.serverToken).then(() => {
-          navigation.goBack();
+        let saveServerInfo = {
+          otpServerIp: settingForm.otpServerIp,
+          otpServerPort: settingForm.otpServerPort,
+          encKey: jsonObj.encKey,
+        };
+
+        mainStore.saveServerStore(saveServerInfo).then(() => {
+          // navigation.goBack();
+          try {
+            mainStore.resetUserStore();
+            navigation.dispatch(resetAction);
+          } catch(e) {
+            navigation.goBack();
+          }
         });
 
       }).catch(err => {

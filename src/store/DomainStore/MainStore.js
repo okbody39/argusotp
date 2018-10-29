@@ -1,5 +1,6 @@
 import { observable, action } from "mobx";
 import { AsyncStorage } from "react-native";
+import _ from 'lodash';
 
 class MainStore {
   @observable userToken = {};
@@ -70,17 +71,29 @@ class MainStore {
   @action
   async saveServerStore(_serverToken) {
     try {
-      let serverToken = _serverToken || JSON.stringify(this.serverToken);
+      // let serverToken = _serverToken || JSON.stringify(this.serverToken);
+      //
+      // if (typeof _serverToken === "object") {
+      //   serverToken = JSON.stringify(_serverToken);
+      // }
+      //
+      // // console.log(serverToken);
+      //
+      // await AsyncStorage.setItem("@SeedAuthStore:serverToken", serverToken);
+      // this.serverToken = JSON.parse(serverToken);
+      // this.isServerSet = true;
 
-      if (typeof _serverToken === "object") {
-        serverToken = JSON.stringify(_serverToken);
-      }
+      // console.log('origin: ', _serverToken);
+      // console.log('before: ', this.serverToken);
 
-      // console.log(serverToken);
+      let serverToken = _.merge(this.serverToken, _serverToken);
 
-      await AsyncStorage.setItem("@SeedAuthStore:serverToken", serverToken);
-      this.serverToken = JSON.parse(serverToken);
+      await AsyncStorage.setItem("@SeedAuthStore:serverToken", JSON.stringify(serverToken));
+      this.serverToken = serverToken;
       this.isServerSet = true;
+
+      // console.log('after: ', this.serverToken);
+
     } catch (e) {
       console.log(e);
     }

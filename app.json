@@ -34,7 +34,7 @@
         "image": "./assets/seed-splash.png"
       },
       "icon": "./assets/SeedIcon-IOS.png",
-      "buildNumber": "9"
+      "buildNumber": "10"
     },
     "android": {
       "package": "net.dfocus.seedauth",
@@ -62,9 +62,9 @@
         "xxhdpi": "./assets/seed-splash.png",
         "xxxhdpi": "./assets/seed-splash.png"
       },
-      "versionCode": 9
+      "versionCode": 10
     },
-    "version": "1.0.9",
+    "version": "1.0.10",
     "splash": {
       "backgroundColor": "#ffffff",
       "resizeMode": "contain",

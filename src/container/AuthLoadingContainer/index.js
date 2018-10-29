@@ -40,7 +40,7 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
     mainStore.loadStore().then(() => {
       var routName = mainStore.isLogin ? "App" : "Auth";
 
-      if (mainStore.isServerSet) {
+      if (mainStore.isServerSet && mainStore.userToken) {
         axios.get(mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId, {
           crossdomain: true,
         }).then(res => {
