@@ -67,17 +67,18 @@ class LoginStore {
       return;
     }
 
-    const alphaNumeric = /[^a-zA-Z0-9 ]/i.test(this.password)
-      ? "Only alphanumeric characters"
-      : undefined;
-    const maxLength =
-      this.password.length > 15 ? "Must be 15 characters or less" : undefined;
+    // const alphaNumeric = /[^a-zA-Z0-9 ]/i.test(this.password)
+    //   ? "Only alphanumeric characters"
+    //   : undefined;
+    // const maxLength =
+    //   this.password.length > 15 ? "Must be 15 characters or less" : undefined;
     const minLength =
       this.password.length < 8 ? "Must be 8 characters or more" : undefined;
     const required = this.password ? undefined : "Required";
     this.passwordError = required
       ? required
-      : alphaNumeric ? alphaNumeric : maxLength ? maxLength : minLength;
+      //: alphaNumeric ? alphaNumeric : maxLength ? maxLength : minLength;
+      : minLength;
   }
 
   @action
