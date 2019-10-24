@@ -1,7 +1,8 @@
 import * as Expo from "expo";
 import * as React from "react";
-import { Provider } from "mobx-react/native";
+import { Provider } from "mobx-react";
 import { StyleProvider } from "native-base";
+import { Root } from "native-base";
 
 import App from "../App";
 import getTheme from "../theme/components";
@@ -26,9 +27,9 @@ export default function(stores) {
 		}
 		async loadFonts() {
 			await Expo.Font.loadAsync({
-				Roboto: require("native-base/Fonts/Roboto.ttf"),
-				Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
-				Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf"),
+				// Roboto: require("native-base/Fonts/Roboto.ttf"),
+				// Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
+				// Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf"),
 			});
 
 			this.setState({ isReady: true });
@@ -41,7 +42,9 @@ export default function(stores) {
 			return (
 				<StyleProvider style={getTheme(variables)}>
 					<Provider {...stores}>
-						<App />
+						<Root>
+							<App />
+						</Root>
 					</Provider>
 				</StyleProvider>
 			);

@@ -7,8 +7,8 @@ import {
   Content, Spinner, Toast
 } from "native-base";
 import axios from "axios";
-import {inject, observer} from "mobx-react/native";
-import {NavigationActions} from "react-navigation";
+import {inject, observer} from "mobx-react";
+import {NavigationActions, StackActions} from "react-navigation";
 import {decrypt} from "../../utils/crypt";
 import Expo, { Constants } from "expo";
 
@@ -46,25 +46,47 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
         }).then(res => {
           const result = res.data;
 
+
+
           let jsonText = decrypt(result, mainStore.serverToken.encKey);
           let jsonObj = JSON.parse(jsonText);
           if (jsonObj.isMissingDevice === "True") {
 
             mainStore.resetStore().then(() => {
-              this.props.navigation.dispatch(NavigationActions.reset({
-                index: 0,
-                actions: [NavigationActions.navigate({routeName: "Logout"})],
-              }));
+              this.props.navigation.dispatch(
+                  StackActions.reset(
+                      {
+                        index: 0,
+                        key: null,
+                        actions: [NavigationActions.navigate({routeName: "Logout"})],
+                      }
+                  )
+              //     NavigationActions.reset({
+              //   index: 0,
+              //   key: null,
+              //   actions: [NavigationActions.navigate({routeName: "Logout"})],
+              // })
+              );
             });
 
           }
         });
       }
 
-      this.props.navigation.dispatch(NavigationActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({ routeName: routName })],
-      }));
+      this.props.navigation.dispatch(
+          StackActions.reset(
+              {
+                index: 0,
+                key: null,
+                actions: [NavigationActions.navigate({ routeName: routName })],
+              }
+          )
+      //     NavigationActions.reset({
+      //   index: 0,
+      //   key: null,
+      //   actions: [NavigationActions.navigate({ routeName: routName })],
+      // })
+      );
 
     });
 

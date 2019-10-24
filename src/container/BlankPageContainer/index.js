@@ -1,6 +1,6 @@
 import * as React from "react";
 import BlankPage from "../../stories/screens/BlankPage";
-import Expo, { Constants } from "expo";
+import Constants from 'expo-constants';
 
 export interface Props {
 	navigation: any,
@@ -16,7 +16,7 @@ export default class BlankPageContainer extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const {version} = Expo.Constants.manifest;
+    const {version} = Constants.manifest;
 
    this.setState({
      version: version

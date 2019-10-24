@@ -1,5 +1,5 @@
 import React from "react";
-import { StackNavigator, DrawerNavigator, SwitchNavigator, createStackNavigator, createSwitchNavigator } from "react-navigation";
+import { createDrawerNavigator, createAppContainer, createStackNavigator, createSwitchNavigator } from "react-navigation";
 import { Root } from "native-base";
 import Login from "./container/LoginContainer";
 import Home from "./container/HomeContainer";
@@ -11,7 +11,7 @@ import AuthLoading from "./container/AuthLoadingContainer";
 import Setting from "./container/SettingContainer";
 import ServerInfo from "./container/ServerInfoContainer";
 
-const Drawer = DrawerNavigator(
+const Drawer = createDrawerNavigator(
 	{
 		Home: { screen: Home },
 	},
@@ -21,7 +21,7 @@ const Drawer = DrawerNavigator(
 	}
 );
 
-const AppStack = StackNavigator(
+const AppStack = createStackNavigator(
 		{
       Login: { screen: Login },
       Logout: { screen: Login },
@@ -36,7 +36,7 @@ const AppStack = StackNavigator(
 		}
 	);
 
-const AuthStack = StackNavigator(
+const AuthStack = createStackNavigator(
 		{
       Login:  { screen: Login },
       PreSetting: { screen: Setting },
@@ -49,7 +49,7 @@ const AuthStack = StackNavigator(
     }
 	);
 
-const AuthSwitch = StackNavigator(
+const AuthSwitch = createStackNavigator(
   {
     AuthLoading:  { screen: AuthLoading },
     App: { screen: AppStack },
@@ -60,13 +60,15 @@ const AuthSwitch = StackNavigator(
     headerMode: "none",
   }
 );
+//
+// class App extends React.Component {
+//   render() {
+//     return (
+//       <Root>
+//       	<AuthSwitch />
+//       </Root>
+// 		);
+//   }
+// }
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <Root>
-      	<AuthSwitch />
-      </Root>
-		);
-  }
-}
+export default createAppContainer(AuthSwitch);

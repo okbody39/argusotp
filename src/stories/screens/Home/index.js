@@ -117,7 +117,7 @@ class Home extends React.Component<Props, State> {
               <Icon
                 active
                 name="menu"
-                onPress={() => this.props.navigation.navigate("DrawerOpen")}
+                onPress={() => this.props.navigation.toggleDrawer()}
               />
             </Button>
           </Left>

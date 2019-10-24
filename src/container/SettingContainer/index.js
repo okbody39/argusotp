@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Item, Input, Icon, Form, Toast } from "native-base";
-import { observer, inject } from "mobx-react/native";
+import { observer, inject } from "mobx-react";
 // import aesjs from "aes-js";
 import axios from "axios";
 import { AsyncStorage } from "react-native";
 
 import { encrypt, decrypt} from "../../utils/crypt";
 import Setting from "../../stories/screens/Setting";
-import {NavigationActions} from "react-navigation";
+import {NavigationActions, StackActions} from "react-navigation";
 
 export interface Props {
   navigation: any,
@@ -16,10 +16,12 @@ export interface Props {
 export interface State {}
 
 const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
-const resetAction = NavigationActions.reset({
-  index: 0,
-  actions: [NavigationActions.navigate({ routeName: "Login", params: { isLogout: true }})],
-});
+const resetAction = StackActions.reset();
+// NavigationActions.reset({
+//   index: 0,
+//   key: null,
+//   actions: [NavigationActions.navigate({ routeName: "Login", params: { isLogout: true }})],
+// });
 
 @inject("settingForm", "mainStore")
 @observer

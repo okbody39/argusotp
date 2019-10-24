@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Alert, Image } from "react-native";
 import { Text, Container, List, ListItem, Content } from "native-base";
-import { NavigationActions } from "react-navigation";
+import { NavigationActions,  StackActions } from "react-navigation";
 
 const routes = [
 	{
@@ -26,10 +26,18 @@ export interface Props {
 	navigation: any,
 }
 export interface State {}
-const resetAction = NavigationActions.reset({
+const resetAction = StackActions.reset(
+	{
 	index: 0,
-	actions: [NavigationActions.navigate({ routeName: "Logout", params: { isLogout: true }})],
-});
+	key: null,
+	actions: [NavigationActions.navigate({ routeName: "Auth", params: { isLogout: true }})],
+}
+);
+// NavigationActions.reset({
+// 	index: 0,
+// 	key: null,
+// 	actions: [NavigationActions.navigate({ routeName: "Logout", params: { isLogout: true }})],
+// });
 export default class Sidebar extends React.Component<Props, State> {
 
 	onPress(route) {

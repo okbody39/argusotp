@@ -1,27 +1,26 @@
-// @flow
 import * as React from "react";
-import { observer, inject } from "mobx-react/native";
+import { observer, inject } from "mobx-react";
 
 import Home from "../../stories/screens/Home";
 // import data from "./data";
-import OTP from "otp-client";
-import styles from "../../stories/screens/VMs/styles";
-import {
-  Body,
-  Button, Container,
-  Content,
-  H1,
-  Header,
-  Icon,
-  Left,
-  List,
-  ListItem,
-  Right,
-  Text,
-  Title
-} from "../../stories/screens/VMs";
-import Sparkline from "react-native-sparkline";
-import {NavigationActions} from "react-navigation";
+// import OTP from "otp-client";
+// import styles from "../../stories/screens/VMs/styles";
+// import {
+//   Body,
+//   Button, Container,
+//   Content,
+//   H1,
+//   Header,
+//   Icon,
+//   Left,
+//   List,
+//   ListItem,
+//   Right,
+//   Text,
+//   Title
+// } from "../../stories/screens/VMs";
+// import Sparkline from "react-native-sparkline";
+// import {NavigationActions} from "react-navigation";
 
 export interface Props {
   navigation: any,
@@ -29,7 +28,6 @@ export interface Props {
 }
 export interface State {}
 
-// @inject("mainStore")
 @inject("mainStore")
 @observer
 export default class HomeContainer extends React.Component<Props, State> {

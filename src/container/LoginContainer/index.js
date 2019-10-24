@@ -1,7 +1,6 @@
-// @flow
 import * as React from "react";
 import { Item, Input, Icon, Form, Toast } from "native-base";
-import { observer, inject } from "mobx-react/native";
+import { observer, inject } from "mobx-react";
 // import aesjs from "aes-js";
 import axios from "axios";
 import { AsyncStorage } from "react-native";

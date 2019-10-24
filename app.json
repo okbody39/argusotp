@@ -1,6 +1,6 @@
 {
   "expo": {
-    "sdkVersion": "30.0.0",
+    "sdkVersion": "33.0.0",
     "loading": {
       "hideExponentText": true,
       "icon": "./assets/seedauth-icon.png"
