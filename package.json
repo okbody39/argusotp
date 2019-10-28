@@ -11,7 +11,8 @@
   "scripts": {
     "start": "expo start",
     "publish": "expo publish",
-    "build-android": "expo build:android -t app-bundle",
+    "build-android": "expo build:android -t apk",
+    "build-android-aab": "expo build:android -t app-bundle",
     "build-ios": "expo build:ios"
   },
   "dependencies": {
