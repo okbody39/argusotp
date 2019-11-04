@@ -89,14 +89,16 @@ class ServerInfo extends React.Component<Props, State> {
                   <Text note>{mainStore.serverToken.otpServerPort}</Text>
                 </Right>
               </ListItem>
+
               {/*<ListItem>*/}
-                {/*<Body>*/}
-                {/*<Text>SCode</Text>*/}
-                {/*</Body>*/}
-                {/*<Right style={{ flex: 1 }}>*/}
-                  {/*<Text note>{settingForm.encKey}</Text>*/}
-                {/*</Right>*/}
+              {/*  <Body>*/}
+              {/*  <Text>SCode</Text>*/}
+              {/*  </Body>*/}
+              {/*  <Right style={{ flex: 1 }}>*/}
+              {/*    <Text note>{JSON.stringify(mainStore.serverToken)}</Text>*/}
+              {/*  </Right>*/}
               {/*</ListItem>*/}
+
               <ListItem>
                 <Body>
                 <Text>Period</Text>
