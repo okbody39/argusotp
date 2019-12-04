@@ -78,7 +78,7 @@ class Home extends React.Component<Props, State> {
         algorithm: "sha1",
         digits: parseInt(mainStore.serverToken.digits),
         period: parseInt(mainStore.serverToken.period),
-        epoch: null
+        epoch: null, // new Date() / 1000,
       };
 
       const otp = new OTP(mainStore.userToken.userId + mainStore.serverToken.otpKey, options);
