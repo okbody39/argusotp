@@ -40,38 +40,39 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
     mainStore.loadStore().then(() => {
       var routName = mainStore.isLogin ? "App" : "Auth";
 
-      if (mainStore.isServerSet && mainStore.userToken) {
-        axios.get(mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId, {
-          crossdomain: true,
-        }).then(res => {
-          const result = res.data;
+      // if (mainStore.isServerSet && mainStore.userToken) {
 
+          // alert(JSON.stringify(mainStore.userToken));
 
-
-          let jsonText = decrypt(result, mainStore.serverToken.encKey);
-          let jsonObj = JSON.parse(jsonText);
-          if (jsonObj.isMissingDevice === "True") {
-
-            mainStore.resetStore().then(() => {
-              this.props.navigation.dispatch(
-                  StackActions.reset(
-                      {
-                        index: 0,
-                        key: null,
-                        actions: [NavigationActions.navigate({routeName: "Logout"})],
-                      }
-                  )
-              //     NavigationActions.reset({
-              //   index: 0,
-              //   key: null,
-              //   actions: [NavigationActions.navigate({routeName: "Logout"})],
-              // })
-              );
-            });
-
-          }
-        });
-      }
+          // axios.get(mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId, {
+          //   crossdomain: true,
+          //   }).then(res => {
+          //     const result = res.data;
+          //
+          //     let jsonText = decrypt(result, mainStore.serverToken.encKey);
+          //     let jsonObj = JSON.parse(jsonText);
+          //     if (jsonObj.isMissingDevice === "True") {
+          //
+          //       mainStore.resetStore().then(() => {
+          //         this.props.navigation.dispatch(
+          //             StackActions.reset(
+          //                 {
+          //                   index: 0,
+          //                   key: null,
+          //                   actions: [NavigationActions.navigate({routeName: "Logout"})],
+          //                 }
+          //             )
+          //         //     NavigationActions.reset({
+          //         //   index: 0,
+          //         //   key: null,
+          //         //   actions: [NavigationActions.navigate({routeName: "Logout"})],
+          //         // })
+          //         );
+          //       });
+          //
+          //     }
+          //   });
+      // }
 
       this.props.navigation.dispatch(
           StackActions.reset(

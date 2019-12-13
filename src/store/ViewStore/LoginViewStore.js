@@ -12,6 +12,7 @@ class LoginStore {
     userId: "",
     password: "",
     pushToken: "",
+    deviceId: "",
   };
 
 
@@ -97,6 +98,11 @@ class LoginStore {
   @action
   setPushInfo(pushToken) {
     this.userToken.pushToken = pushToken;
+  }
+
+  @action
+  setDeviceId(deviceId) {
+    this.userToken.deviceId = deviceId;
   }
 
   @action

@@ -1,4 +1,5 @@
 import * as React from "react";
+import Constants from 'expo-constants';
 import { Item, Input, Icon, Form, Toast } from "native-base";
 import { observer, inject } from "mobx-react";
 // import aesjs from "aes-js";
@@ -48,6 +49,9 @@ export default class LoginContainer extends React.Component<Props, State> {
 
         loginForm.setPushInfo(token);
 
+        const deviceId = Constants.deviceId;
+
+        loginForm.setDeviceId(deviceId);
     };
 
     componentWillMount() {
@@ -101,6 +105,7 @@ export default class LoginContainer extends React.Component<Props, State> {
                 userid: loginForm.userId,
                 userpassword: loginForm.password,
                 pushToken: loginForm.userToken.pushToken,
+                deviceId: loginForm.userToken.deviceId,
                 code: "",
             };
 
@@ -119,7 +124,7 @@ export default class LoginContainer extends React.Component<Props, State> {
                 let jsonText = decrypt(result, mainStore.serverToken.encKey);
                 let jsonObj = JSON.parse(jsonText);
 
-                alert(jsonText);
+                // alert(jsonText);
 
                 if (jsonObj.result === "True") {
 
@@ -154,7 +159,7 @@ export default class LoginContainer extends React.Component<Props, State> {
 
 
         } else {
-            alert("2");
+            // alert("2");
             Toast.show({
                 text: "Username or password invalid!",
                 duration: 2000,

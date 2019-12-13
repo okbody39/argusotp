@@ -39,13 +39,19 @@ export default class HomeContainer extends React.Component<Props, State> {
   }
 
   _bootstrapAsync = async () => {
-    const { loginForm, settingForm } = this.props;
+    // const { mainStore } = this.props;
+    //
+    // mainStore.loadStore().then(() => {
+    //     alert(JSON.stringify(mainStore.userToken));
+    // });
 
     // loginForm.loadUserAuthInfo();
     // settingForm.loadOtpServerInfo();
 
     // console.log('HomeContainer....', loginForm.userId);
     // const userToken = loginForm.checkUserAuthInfo();
+
+
 
   };
 
