@@ -31,6 +31,11 @@ class Home extends React.Component<Props, State> {
 
     constructor(props) {
         super(props);
+
+        let period = parseInt(this.props.mainStore.serverToken.period) - 1;
+
+        this.rdm = Math.floor(Math.random()*(period-1+1)) + 1;
+
         this.state = {
             token: "000000",
             prevToken: "000000",
@@ -102,10 +107,12 @@ class Home extends React.Component<Props, State> {
                 progress: progress,
             });
 
-            if(timeLeft === 1) {
+            if(timeLeft === this.rdm) {
                 // this.prop.mainStore.loadStore().then(() => {
                 //    alert(mainStore.userToken.userId + "/" + mainStore.userToken.deviceId);
                 // });
+
+                // alert(this.rdm);
 
                 let checkUrl = mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId + "/" + mainStore.userToken.deviceId;
 

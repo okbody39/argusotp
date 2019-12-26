@@ -38,17 +38,20 @@ class LoginStore {
     }
 
     const required = this.userId ? undefined : "Required";
-    const alphaNumeric = /[^a-zA-Z0-9 ]/i.test(this.userId)
-      ? "Only alphanumeric characters"
-      : undefined;
-    const maxLength =
-      this.userId.length > 15 ? "Must be 15 characters or less" : undefined;
-    const minLength =
-      this.userId.length < 4 ? "Must be 4 characters or more" : undefined;
 
-    this.userIdError = required
-      ? required
-      : alphaNumeric ? alphaNumeric : maxLength ? maxLength : minLength;
+    // const alphaNumeric = /[^a-zA-Z0-9 ]/i.test(this.userId)
+    //   ? "Only alphanumeric characters"
+    //   : undefined;
+    // const maxLength =
+    //   this.userId.length > 15 ? "Must be 15 characters or less" : undefined;
+    // const minLength =
+    //   this.userId.length < 4 ? "Must be 4 characters or more" : undefined;
+
+    // this.userIdError = required
+    //   ? required
+    //     : alphaNumeric ? alphaNumeric : maxLength ? maxLength : minLength;
+
+    this.userIdError = required;
 
   }
 
@@ -73,13 +76,17 @@ class LoginStore {
     //   : undefined;
     // const maxLength =
     //   this.password.length > 15 ? "Must be 15 characters or less" : undefined;
-    const minLength =
-      this.password.length < 8 ? "Must be 8 characters or more" : undefined;
+    // const minLength =
+    //   this.password.length < 8 ? "Must be 8 characters or more" : undefined;
+
     const required = this.password ? undefined : "Required";
-    this.passwordError = required
-      ? required
-      //: alphaNumeric ? alphaNumeric : maxLength ? maxLength : minLength;
-      : minLength;
+
+    // this.passwordError = required
+    //   ? required
+    //   //: alphaNumeric ? alphaNumeric : maxLength ? maxLength : minLength;
+    //   : minLength;
+
+    this.passwordError = required;
   }
 
   @action
