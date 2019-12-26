@@ -102,7 +102,7 @@ export default class SettingContainer extends React.Component<Props, State> {
                     <Input
                         placeholder="Server IP"
                         placeholderTextColor="#c9c9c9"
-                        keyboardType="numeric"
+                        // keyboardType="numeric"
                         value={settingForm.otpServerIp}
                         onChangeText={e => settingForm.serverIpOnChange(e)}
                     />

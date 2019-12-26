@@ -14,6 +14,12 @@ import ProgressBar from "react-native-progress-bar";
 
 import OTP from "otp-client";
 import { AsyncStorage } from "react-native";
+
+import { Dimensions } from "react-native";
+
+// const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
+
 import { TextLetterSpacing } from "./TextLetterSpacing";
 import axios from "axios";
 import {decrypt} from "../../../utils/crypt";
@@ -225,7 +231,7 @@ class Home extends React.Component<Props, State> {
                         <ProgressBar
                             fillStyle={{backgroundColor: this.state.textColor}}
                             backgroundStyle={{backgroundColor: "#cccccc", borderRadius: 2}}
-                            style={{marginTop: 10, width: 300}}
+                            style={{marginTop: 10, width: deviceWidth * 0.8 }}
                             progress={this.state.progress}
                         />
                         {/*</Body>*/}
