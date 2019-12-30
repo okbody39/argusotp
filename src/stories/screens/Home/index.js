@@ -13,6 +13,8 @@ import styles from "./styles";
 import ProgressBar from "react-native-progress-bar";
 
 import OTP from "otp-client";
+import md5 from "md5";
+
 import { AsyncStorage } from "react-native";
 
 import { Dimensions } from "react-native";
@@ -51,6 +53,7 @@ class Home extends React.Component<Props, State> {
             intervalId: null,
             textColor: "#3b5998",
             progress: 0,
+            timeDiff: 0,
         };
 
     }
@@ -79,6 +82,34 @@ class Home extends React.Component<Props, State> {
         //   this.setState({otpKey: result});
         // });
 
+        setTimeout(() => {
+            let checkUrl = this.props.mainStore.getServerUrl() + "/otp/epoch";
+
+            // alert(checkUrl);
+
+            axios.get(checkUrl, {
+                crossdomain: true,
+            }).then(res => {
+                const result = res.data;
+                let myTime = new Date().valueOf();
+                let diff = result.epoch - myTime;
+
+                // alert(result.epoch + " - " + myTime + " = " + diff);
+
+                this.setState({
+                    timeDiff: diff,
+                })
+
+            });
+        }, 500);
+
+        let secret = this.props.mainStore.userToken.userId + this.props.mainStore.serverToken.otpKey;
+        if(secret.length > 14) {
+            secret = md5(secret).substr(0, 14);
+        }
+
+        // alert(secret);
+
         let intervalId = setInterval(() => {
 
             const { mainStore } = this.props;
@@ -93,10 +124,10 @@ class Home extends React.Component<Props, State> {
                 algorithm: "sha1",
                 digits: parseInt(mainStore.serverToken.digits),
                 period: parseInt(mainStore.serverToken.period),
-                epoch: null, // new Date() / 1000,
+                epoch: ( new Date().valueOf() + this.state.timeDiff ), //null, // new Date() / 1000,
             };
 
-            const otp = new OTP(mainStore.userToken.userId + mainStore.serverToken.otpKey, options);
+            const otp = new OTP(secret, options);
             const token = otp.getToken();
             const prevToken = otp.getToken(-1);
             const nextToken = otp.getToken(1);
@@ -121,6 +152,8 @@ class Home extends React.Component<Props, State> {
                 // alert(this.rdm);
 
                 let checkUrl = mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId + "/" + mainStore.userToken.deviceId;
+                // let startTime = new Date().valueOf();
+                let myTime = new Date().valueOf();
 
                 axios.get(checkUrl, {
                     crossdomain: true,
@@ -148,6 +181,15 @@ class Home extends React.Component<Props, State> {
                             //     )
                             // );
                         });
+                    } else {
+
+                        // let responseTime = myTime - startTime;
+                        // let diff = result.epoch - myTime - responseTime;
+                        let diff = jsonObj.time - myTime; // + ", " + responseTime;
+
+                        this.setState({
+                            timeDiff: diff,
+                        });
                     }
                 });
             }
@@ -160,6 +202,27 @@ class Home extends React.Component<Props, State> {
 
     componentWillUnmount() {
         clearInterval(this.state.intervalId);
+    }
+
+    timeSync() {
+        let checkUrl = this.props.mainStore.getServerUrl() + "/otp/epoch";
+
+        // alert(checkUrl);
+
+        axios.get(checkUrl, {
+            crossdomain: true,
+        }).then(res => {
+            const result = res.data;
+            let myTime = new Date().valueOf();
+            let diff = result.epoch - myTime;
+
+            // alert(result.epoch + " - " + myTime + " = " + diff);
+
+            this.setState({
+                timeDiff: diff,
+            })
+
+        });
     }
 
     render() {
@@ -249,6 +312,11 @@ class Home extends React.Component<Props, State> {
                     <View padder>
                         <Button block onPress={() => this.props.navigation.navigate("ServerInfo")}>
                             <Text>Detail Information</Text>
+                        </Button>
+                    </View>
+                    <View padder style={{marginTop: -10}}>
+                        <Button block warning onPress={() => this.timeSync()}>
+                            <Text>Time Sync (diff: {this.state.timeDiff}ms)</Text>
                         </Button>
                     </View>
                 </Content>

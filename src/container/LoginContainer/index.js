@@ -83,6 +83,7 @@ export default class LoginContainer extends React.Component<Props, State> {
 
     login() {
         const { loginForm, navigation, mainStore } = this.props;
+        const { version } = Constants.manifest;
 
         if (!mainStore.isServerSet) {
             Toast.show({
@@ -106,12 +107,13 @@ export default class LoginContainer extends React.Component<Props, State> {
                 userpassword: loginForm.password,
                 pushToken: loginForm.userToken.pushToken,
                 deviceId: loginForm.userToken.deviceId,
+                appVersion: version,
                 code: "",
             };
 
-            // alert("1-3 : " + loginForm.userId);
+            // alert();
 
-            var encryptedHex = encrypt(JSON.stringify(formPayload), mainStore.serverToken.encKey);
+            let encryptedHex = encrypt(JSON.stringify(formPayload), mainStore.serverToken.encKey);
 
             // console.log(encryptedHex);
 

@@ -1,6 +1,6 @@
 {
   "name": "SeedAuth-Mobile",
-  "version": "2.0.4",
+  "version": "2.0.7",
   "private": true,
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.6.0",
@@ -25,6 +25,7 @@
     "expo-font": "~5.0.1",
     "expo-permissions": "~5.0.1",
     "lodash": "4.17.4",
+    "md5": "^2.2.1",
     "mobx": "^5.14.2",
     "mobx-react": "^5.4.3",
     "native-base": "^2.13.8",
