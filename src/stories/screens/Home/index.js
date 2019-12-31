@@ -17,7 +17,7 @@ import md5 from "md5";
 
 import { AsyncStorage } from "react-native";
 
-import { Dimensions } from "react-native";
+import { Dimensions, Alert } from "react-native";
 
 // const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -152,8 +152,7 @@ class Home extends React.Component<Props, State> {
                 // alert(this.rdm);
 
                 let checkUrl = mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId + "/" + mainStore.userToken.deviceId;
-                // let startTime = new Date().valueOf();
-                let myTime = new Date().valueOf();
+                let startTime = new Date().valueOf();
 
                 axios.get(checkUrl, {
                     crossdomain: true,
@@ -169,7 +168,17 @@ class Home extends React.Component<Props, State> {
 
                         mainStore.resetStore().then(() => {
 
-                            Updates.reload();
+                            Alert.alert(
+                                'Warning',
+                                //body
+                                ' Your device is not allowed to access...',
+                                [
+                                    {text: 'Exit', onPress: () => mainStore.resetUserStore().then(() => {
+                                            Updates.reload();
+                                        })},
+                                ],
+                                { cancelable: false }
+                            );
 
                             // this.props.navigation.dispatch(
                             //     StackActions.reset(
@@ -181,11 +190,52 @@ class Home extends React.Component<Props, State> {
                             //     )
                             // );
                         });
-                    } else {
+                    } else if (jsonObj.isMissingDevice === "PolicyChanged") {
+                        // let _serverToken = {
+                        //     period: jsonObj.period,
+                        //     digits: jsonObj.digits,
+                        // };
+                        //
+                        // mainStore.saveServerStore(_serverToken);
 
-                        // let responseTime = myTime - startTime;
-                        // let diff = result.epoch - myTime - responseTime;
-                        let diff = jsonObj.time - myTime; // + ", " + responseTime;
+                        Alert.alert(
+                            'Policy Update',
+                            //body
+                            'Restart app to finish accepting changed policy.',
+                            [
+                                {text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
+                                        Updates.reload();
+                                    })},
+                            ],
+                            { cancelable: false }
+                        );
+
+
+                            // setTimeout(() => {
+                            //     mainStore.resetUserStore().then(() => {
+                            //         Updates.reload();
+                            //     });
+                            // }, 500);
+
+
+                        // loginForm.userToken.userId = loginForm.userId;
+                        // loginForm.userToken.password = loginForm.password;
+                        //
+                        // mainStore.serverToken.otpKey = jsonObj.reason;
+                        // mainStore.serverToken.period = jsonObj.period;
+                        // mainStore.serverToken.digits = jsonObj.digits;
+                        //
+                        // mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
+                        //     // setTimeout(() => {
+                        //     navigation.navigate("AuthLoading");
+                        //     // }, 500);
+                        // });
+
+
+                    } else {
+                        let myTime = new Date().valueOf();
+                        let responseTime = myTime - startTime;
+                        let diff = parseInt( jsonObj.time - ( myTime - ( responseTime * 3 / 4 ) ) );
 
                         this.setState({
                             timeDiff: diff,
@@ -316,7 +366,7 @@ class Home extends React.Component<Props, State> {
                     </View>
                     <View padder style={{marginTop: -10}}>
                         <Button block warning onPress={() => this.timeSync()}>
-                            <Text>Time Sync (diff: {this.state.timeDiff}ms)</Text>
+                            <Text>Time Sync (diff: {this.state.timeDiff > 1000 ? this.state.timeDiff/1000 + "s" : this.state.timeDiff + "ms"})</Text>
                         </Button>
                     </View>
                 </Content>
