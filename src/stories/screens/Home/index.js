@@ -15,9 +15,7 @@ import ProgressBar from "react-native-progress-bar";
 import OTP from "otp-client";
 import md5 from "md5";
 
-import { AsyncStorage } from "react-native";
-
-import { Dimensions, Alert } from "react-native";
+import { AsyncStorage, Dimensions, Alert } from "react-native";
 
 // const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
