@@ -81,7 +81,7 @@ class Home extends React.Component<Props, State> {
         // });
 
         setTimeout(() => {
-            let checkUrl = this.props.mainStore.getServerUrl() + "/otp/epoch";
+            let checkUrl = this.props.mainStore.getServerUrl() + "/otp/epoch/" + this.props.mainStore.userToken.userId;
 
             // alert(checkUrl);
 
