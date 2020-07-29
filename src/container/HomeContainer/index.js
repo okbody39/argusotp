@@ -25,8 +25,8 @@ import Home from "../../stories/screens/Home";
 export interface Props {
   navigation: any,
   mainStore: any,
-}
-export interface State {}
+};
+export interface State {};
 
 @inject("mainStore")
 @observer

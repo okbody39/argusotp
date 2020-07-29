@@ -5,7 +5,8 @@ import { observer, inject } from "mobx-react";
 // import aesjs from "aes-js";
 import axios from "axios";
 import { AsyncStorage } from "react-native";
-import { Permissions, Notifications } from "expo";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
 
 import { encrypt, decrypt} from "../../utils/crypt";
 import Login from "../../stories/screens/Login";

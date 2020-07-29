@@ -3,8 +3,8 @@ import { Container, Header, Title, Content, Text, Button, Icon, Row, Left, Right
 import Sparkline from 'react-native-sparkline';
 import axios from 'axios';
 import OTP from 'otp-client';
-import {AsyncStorage} from "react-native";
-
+import {AsyncStorage, Image} from "react-native";
+// import styles from "./styles";
 export interface Props {
 	navigation: any;
 }
@@ -56,78 +56,82 @@ class ServerInfo extends React.Component<Props, State> {
           </Right>
 				</Header>
 
-        <Content padder>
-          <Card>
-            <List>
-              <ListItem itemDivider>
-                <Text>User Information</Text>
-              </ListItem>
-              <ListItem>
-                <Body>
-                <Text>ID</Text>
-                </Body>
-                <Right style={{ flex: 1 }}>
-                  <Text note>{mainStore.userToken.userId}</Text>
-                </Right>
-              </ListItem>
-              <ListItem itemDivider>
-                <Text>OTP Server Information</Text>
-              </ListItem>
-              <ListItem>
-                <Body>
-                  <Text>IP</Text>
-                </Body>
-                <Right style={{ flex: 1 }}>
-                  <Text note>{mainStore.serverToken.otpServerIp}</Text>
-                </Right>
-              </ListItem>
-              <ListItem>
-                <Body>
-                  <Text>Port</Text>
-                </Body>
-                <Right style={{ flex: 1 }}>
-                  <Text note>{mainStore.serverToken.otpServerPort}</Text>
-                </Right>
-              </ListItem>
+        <Content padder style={{backgroundColor: "white"}}>
+          {/*<Card>*/}
+          {/*  <CardItem>*/}
 
-              {/*<ListItem>*/}
-              {/*  <Body>*/}
-              {/*  <Text>SCode</Text>*/}
-              {/*  </Body>*/}
-              {/*  <Right style={{ flex: 1 }}>*/}
-              {/*    <Text note>{JSON.stringify(mainStore.serverToken)}</Text>*/}
-              {/*  </Right>*/}
-              {/*</ListItem>*/}
+              <List>
+                <ListItem itemDivider>
+                  <Text>User Information</Text>
+                </ListItem>
+                <ListItem>
+                  <Body>
+                    <Text>ID</Text>
+                  </Body>
+                  <Right style={{ flex: 1 }}>
+                    <Text note>{mainStore.userToken.userId}</Text>
+                  </Right>
+                </ListItem>
+                <ListItem itemDivider>
+                  <Text>OTP Server Information</Text>
+                </ListItem>
+                <ListItem>
+                  <Body>
+                    <Text>IP</Text>
+                  </Body>
+                  <Right style={{ flex: 1 }}>
+                    <Text note>{mainStore.serverToken.otpServerIp}</Text>
+                  </Right>
+                </ListItem>
+                <ListItem>
+                  <Body>
+                    <Text>Port</Text>
+                  </Body>
+                  <Right style={{ flex: 1 }}>
+                    <Text note>{mainStore.serverToken.otpServerPort}</Text>
+                  </Right>
+                </ListItem>
 
-              <ListItem>
-                <Body>
-                <Text>Period</Text>
-                </Body>
-                <Right style={{ flex: 1 }}>
-                  <Text note>{mainStore.serverToken.period}</Text>
-                </Right>
-              </ListItem>
-              <ListItem>
-                <Body>
-                <Text>Digits</Text>
-                </Body>
-                <Right style={{ flex: 1 }}>
-                  <Text note>{mainStore.serverToken.digits}</Text>
-                </Right>
-              </ListItem>
-              <ListItem itemDivider>
-                <Text>App Information</Text>
-              </ListItem>
-              <ListItem>
-                <Body>
-                <Text>Version</Text>
-                </Body>
-                <Right style={{ flex: 1 }}>
-                  <Text note>v{ver}</Text>
-                </Right>
-              </ListItem>
-            </List>
-          </Card>
+                {/*<ListItem>*/}
+                {/*  <Body>*/}
+                {/*  <Text>SCode</Text>*/}
+                {/*  </Body>*/}
+                {/*  <Right style={{ flex: 1 }}>*/}
+                {/*    <Text note>{JSON.stringify(mainStore.serverToken)}</Text>*/}
+                {/*  </Right>*/}
+                {/*</ListItem>*/}
+
+                <ListItem>
+                  <Body>
+                  <Text>Period</Text>
+                  </Body>
+                  <Right style={{ flex: 1 }}>
+                    <Text note>{mainStore.serverToken.period}</Text>
+                  </Right>
+                </ListItem>
+                <ListItem>
+                  <Body>
+                  <Text>Digits</Text>
+                  </Body>
+                  <Right style={{ flex: 1 }}>
+                    <Text note>{mainStore.serverToken.digits}</Text>
+                  </Right>
+                </ListItem>
+                <ListItem itemDivider>
+                  <Text>App Information</Text>
+                </ListItem>
+                <ListItem>
+                  <Body>
+                  <Text>Version</Text>
+                  </Body>
+                  <Right style={{ flex: 1 }}>
+                    <Text note>v{ver}</Text>
+                  </Right>
+                </ListItem>
+              </List>
+
+          {/*    </CardItem>*/}
+          {/*</Card>*/}
           {/*<View padder>*/}
             {/*<Button block info onPress={() => this.props.navigation.navigate("Setting")}>*/}
               {/*<Text>Server Setting</Text>*/}

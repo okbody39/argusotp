@@ -2,11 +2,16 @@ import * as React from "react";
 import { Alert, Image } from "react-native";
 import { Text, Container, List, ListItem, Content } from "native-base";
 import { NavigationActions,  StackActions } from "react-navigation";
+// import { DrawerActions } from "react-navigation-drawer";
 
 const routes = [
 	{
 		route: "Home",
-		caption: "OTP",
+		caption: "Home",
+	},
+	{
+		route: "LockSet",
+		caption: "Lock setting",
 	},
   {
     route: "Setting",
@@ -41,21 +46,30 @@ const resetAction = StackActions.reset(
 export default class Sidebar extends React.Component<Props, State> {
 
 	onPress(route) {
-    if(route === 'Logout') {
 
-      Alert.alert(
-        'Logout',
-        'Are you sure you want to logout?',
-        [
-          {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-          {text: 'OK', onPress: () => this.props.navigation.dispatch(resetAction)},
-        ],
-        { cancelable: true }
-      )
+		// DrawerActions.closeDrawer();
+
+		if(route === 'Logout') {
+
+		  Alert.alert(
+			'Logout',
+			'Are you sure you want to logout?',
+			[
+			  {text: 'Cancel', onPress: () => {}, style: 'cancel'},
+			  {text: 'OK', onPress: () => this.props.navigation.dispatch(resetAction)},
+			],
+			{ cancelable: true }
+		  );
+
+		} else if(route === 'Home') {
+
 
 		} else {
-      this.props.navigation.navigate(route);
+			this.props.navigation.navigate(route);
 		}
+
+
+
 		return;
 	}
 

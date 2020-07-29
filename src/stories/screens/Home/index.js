@@ -4,7 +4,7 @@ import {
     Container, Header, Title, Content,
     Text, Button, Icon, Left, Body, Right,
     List, ListItem, Row, Col,
-    Card, CardItem,
+    Card, CardItem, Toast,
     H1, H2, H3, View
 } from "native-base";
 
@@ -15,7 +15,7 @@ import ProgressBar from "react-native-progress-bar";
 import OTP from "otp-client";
 import md5 from "md5";
 
-import { AsyncStorage, Dimensions, Alert } from "react-native";
+import {AsyncStorage, Dimensions, Alert, AppState} from "react-native";
 
 // const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -52,12 +52,40 @@ class Home extends React.Component<Props, State> {
             textColor: "#3b5998",
             progress: 0,
             timeDiff: 0,
+            appState: AppState.currentState,
         };
 
     }
 
+    componentWillUnmount() {
+        AppState.removeEventListener('change', this._handleAppStateChange);
+    }
+
+    _handleAppStateChange = nextAppState => {
+        if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+            // console.log('App has come to the foreground!');
+            // Toast.show({
+            //     text: "App has come to the foreground!",
+            //     // buttonText: "OK",
+            //     // type: "success",
+            //     duration: 2000,
+            // });
+
+            AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+                if(lockPass) {
+                    this.props.navigation.navigate("Lock");
+                }
+            });
+
+
+        }
+        this.setState({ appState: nextAppState });
+    };
+
 
     componentDidMount() {
+
+        AppState.addEventListener('change', this._handleAppStateChange);
 
         // AsyncStorage.getItem("@ApiKeysStore:period", (err, result) => {
         //   if (err) {
@@ -266,6 +294,13 @@ class Home extends React.Component<Props, State> {
 
             // alert(result.epoch + " - " + myTime + " = " + diff);
 
+            Toast.show({
+                text: "Time sync - Success",
+                // buttonText: "OK",
+                type: "success",
+                duration: 2000,
+            });
+
             this.setState({
                 timeDiff: diff,
             })
@@ -287,7 +322,7 @@ class Home extends React.Component<Props, State> {
                         </Button>
                     </Left>
                     <Body>
-                        <Title>OTP</Title>
+                        <Title>SeedAuth</Title>
                     </Body>
                     <Right />
                 </Header>
