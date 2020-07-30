@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Container, Header, Title, Content, Text, Button, Icon, Row, Left, Right, Body, List, ListItem, H1, Card, CardItem, View } from "native-base";
-import Sparkline from 'react-native-sparkline';
+// import Sparkline from 'react-native-sparkline';
 import axios from 'axios';
 import OTP from 'otp-client';
 import {AsyncStorage, Image} from "react-native";

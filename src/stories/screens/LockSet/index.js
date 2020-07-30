@@ -1,5 +1,5 @@
-import * as React from "react";
-import { Image, Platform, Dimensions } from "react-native";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Image, Platform, Dimensions, Alert } from "react-native";
 import { AsyncStorage } from "react-native";
 import {
   Container,
@@ -18,146 +18,159 @@ import {
   View,
   Toast
 } from "native-base";
-import PasswordGesture from 'react-native-gesture-password';
+
+import ReactNativePinView from "react-native-pin-view";
 
 const platform = Platform.OS;
 import styles from "./styles";
-// import {Image} from "../Login";
-// import pkg from "package";
-
-export interface Props {
-	navigation: any;
-}
-export interface State {}
 
 var Password1 = '';
 
-class LockSet extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
+const LockSet = (props) => {
+  const pinView = useRef(null);
+  const [showRemoveButton, setShowRemoveButton] = useState(false);
+  const [enteredPin, setEnteredPin] = useState("");
+  const [showCompletedButton, setShowCompletedButton] = useState(false);
+  const [message, setMessage] = useState(" ");
+  const [status, setStatus] = useState("normal");
 
-    this.pg = null;
-
-    this.state = {
-      message: 'Please input your password.',
-      status: 'normal'
-    };
-  }
-
-  componentDidMount() {
-    Password1 = '';
-  }
-
-  onEnd = (password)=> {
-    if ( Password1 === '' ) {
-      // The first password
-      Password1 = password;
-      this.setState({
-        status: 'normal',
-        message: 'Please input your password secondly.'
-      });
-
-      this.pg.resetActive();
+  useEffect(() => {
+    if (enteredPin.length > 0) {
+      setShowRemoveButton(true);
     } else {
-      // The second password
-      if ( password === Password1 ) {
-        this.setState({
-          status: 'right',
-        //   message: 'Your password is set to ' + password
-        });
+      setShowRemoveButton(false);
+    }
+    if (enteredPin.length === 4) {
+      if ( Password1 === '' ) {
+        Password1 = enteredPin;
+        setStatus( 'normal');
+        setMessage( 'Please input your password secondly.');
 
-        let userToken = AsyncStorage.setItem("@SeedAuthStore:lockToken", password);
-
-        Password1 = '';
-
-        Toast.show({
-          text: 'Your password is set successful.',
-          // buttonText: "OK",
-          type: "success",
-          duration: 2000,
-        });
-
-        this.props.navigation.navigate("Home");
-
+        pinView.current.clearAll();
 
       } else {
-        this.setState({
-          status: 'wrong',
-          message:  'Not the same, try again.'
-        });
-        Password1 = '';
-        this.pg.resetActive();
+        // The second password
+        if ( enteredPin === Password1 ) {
+
+          AsyncStorage.setItem("@SeedAuthStore:lockToken", enteredPin);
+
+          Password1 = '';
+
+          Toast.show({
+            text: 'Your password is set successful.',
+            // buttonText: "OK",
+            type: "success",
+            duration: 2000,
+          });
+
+          props.navigation.navigate("Home");
+
+
+        } else {
+          setStatus( 'error');
+          setMessage( 'Not the same, try again.');
+
+          Password1 = '';
+          pinView.current.clearAll();
+        }
       }
     }
+  }, [enteredPin]);
+
+  clearPincode = () => {
+    Alert.alert(
+      'Confirm',
+      'Are you sure clear Pin code?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel'
+        },
+        { text: 'OK',
+          onPress: () => {
+            AsyncStorage.removeItem("@SeedAuthStore:lockToken");
+
+            Toast.show({
+              text: 'Your password clear successful.',
+              // buttonText: "OK",
+              type: "success",
+              duration: 2000,
+            });
+
+            props.navigation.navigate("Home");
+          }
+        }
+      ],
+      { cancelable: false }
+    );
+
   };
 
-  onStart=()=> {
-    if ( Password1 === '') {
-      this.setState({
-        message: 'Please input your password.'
-      });
-    } else {
-      this.setState({
-        message: 'Please input your password secondly.'
-      });
-    }
-  };
+  return (
+    <Container style={styles.container}>
+      <Content padder>
+        <Body style={{ alignItems: "center", paddingTop: 20 }}>
+            <Image
+              source={require("../../../../assets/logo-seedauth.png")}
+              style={{width: 600 / 2.5, height: 172 / 2.5}}
+            />
 
-	render() {
-		const {ver} = this.props;
-		return (
-
-			<Container style={styles.container}>
-        {/*<Header style={{ height: 150 }}>*/}
-        {/*  <Body style={{ alignItems: "center" }}>*/}
-        {/*    /!*<Icon name="cloud" style={{ fontSize: 100 }} />*!/*/}
-        {/*    {platform === "ios" ?*/}
-        {/*      <Image*/}
-        {/*        source={require("../../../../assets/logo-seedauth.png")}*/}
-        {/*        style={{width: 600 / 2.5, height: 172 / 2.5}}*/}
-        {/*      />*/}
-        {/*      :*/}
-        {/*      <Image*/}
-        {/*        source={require("../../../../assets/logo-seedauth-white.png")}*/}
-        {/*        style={{width: 600 / 2.5, height: 172 / 2.5}}*/}
-        {/*      />*/}
-        {/*    }*/}
-        {/*    /!*<Title>SeedAuth Mobile</Title>*!/*/}
-        {/*    <View padder>*/}
-        {/*      <Text style={{ color: Platform.OS === "ios" ? "#000" : "#FFF" }}>*/}
-        {/*        { this.state.message }*/}
-        {/*      </Text>*/}
-        {/*    </View>*/}
-        {/*  </Body>*/}
-        {/*</Header>*/}
-          <PasswordGesture
-            ref={ref => {
-              this.pg = ref;
-            }}
-            status={this.state.status}
-            message={this.state.message}
-            onStart={() => this.onStart()}
-            onEnd={(password) => this.onEnd(password)}
-            children={
-              <View style={{
-                position: "absolute",
-                bottom: 20,
-                width: Dimensions.get("window").width,
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
-                <Image
-                  source={require("../../../../assets/logo-seedauth-white.png")}
-                  style={{width: 600 / 2.5, height: 172 / 2.5}}
-                />
-              </View>
+          <View padder>
+            <Text style={{ color: status === "normal" ? "#0BA3EE" : "red" }}>
+              { message }
+            </Text>
+          </View>
+        </Body>
+      {/*</Header>*/}
+      {/*<Content padder>*/}
+        <ReactNativePinView
+          inputSize={32}
+          ref={pinView}
+          pinLength={4}
+          buttonSize={60}
+          onValueChange={value => setEnteredPin(value)}
+          buttonAreaStyle={{
+            marginTop: 10,
+          }}
+          inputAreaStyle={{
+            marginTop: 10,
+            marginBottom: 24,
+          }}
+          inputViewEmptyStyle={{
+            backgroundColor: "transparent",
+            borderWidth: 1,
+            borderColor: "#0BA3EE",
+          }}
+          inputViewFilledStyle={{
+            backgroundColor: "#0BA3EE",
+          }}
+          buttonViewStyle={{
+            borderWidth: 1,
+            borderColor: "#0BA3EE",
+          }}
+          buttonTextStyle={{
+            color: "#0BA3EE",
+          }}
+          onButtonPress={key => {
+            if (key === "custom_left") {
+              pinView.current.clear();
+            } else if (key === "custom_right") {
+              props.navigation.navigate("Home");
             }
-          />
+          }}
+          customLeftButton={showRemoveButton ? <Icon name={"ios-backspace"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
+          customRightButton={<Text style={{fontSize: 16, color: '#0BA3EE'}}>Cancel</Text>}
+        />
 
+        <View padder style={{marginTop: 10}}>
+          <Button  danger small block onPress={() => clearPincode()}>
+            <Text>Clear Pin code</Text>
+          </Button>
+        </View>
 
-			</Container>
-		);
-	}
+      </Content>
+    </Container>
+  )
 }
-
-export default LockSet;
+export default LockSet

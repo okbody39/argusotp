@@ -1,4 +1,5 @@
-import * as React from "react";
+// import * as React from "react";
+import React, { useEffect, useRef, useState } from "react"
 import {Image, Platform, Dimensions, AsyncStorage} from "react-native";
 import {
   Container,
@@ -16,121 +17,212 @@ import {
   Row,
   View
 } from "native-base";
-import PasswordGesture from 'react-native-gesture-password';
+
+import ReactNativePinView from "react-native-pin-view";
 
 const platform = Platform.OS;
 import styles from "./styles";
 // import {Image} from "../Login";
 // import pkg from "package";
 
-export interface Props {
-	navigation: any;
-}
-export interface State {}
+const Lock = (props) => {
+  const pinView = useRef(null);
+  const [showRemoveButton, setShowRemoveButton] = useState(false);
+  const [enteredPin, setEnteredPin] = useState("");
+  const [showCompletedButton, setShowCompletedButton] = useState(false);
+  const [message, setMessage] = useState(" ");
+  const [status, setStatus] = useState("normal");
 
-class Lock extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
+  useEffect(() => {
+    if (enteredPin.length > 0) {
+      setShowRemoveButton(true);
+    } else {
+      setShowRemoveButton(false);
+    }
+    if (enteredPin.length === 4) {
+      AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+        if (enteredPin == lockPass) {
+          setStatus( 'normal');
+          setMessage("");
+          pinView.current.clearAll();
 
-    this.pg = null;
+          props.navigation.navigate("Home");
 
-    this.state = {
-      message: 'Please input your password.',
-      status: 'normal'
-    };
-  }
+        } else {
+          setStatus( 'error');
+          setMessage("Password is wrong, try again.");
+          pinView.current.clearAll();
+        }
+      });
+    }
+  }, [enteredPin]);
 
-  onEnd = (password)=> {
-    AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
-      if (password == lockPass) {
-        this.setState({
-          status: 'right',
-          message: 'Password is right, success.'
-        });
 
-        this.props.navigation.navigate("Home");
-        this.pg.resetActive();
-
-        // your codes to close this view
-      } else {
-        this.setState({
-          status: 'wrong',
-          message: 'Password is wrong, try again.'
-        });
-      }
-    });
-
-  };
-
-  onStart=()=> {
-    this.setState({
-      status: 'normal',
-      message: 'Please input your password.'
-    });
-  };
-
-  onReset=()=>{
-    this.setState({
-      status: 'normal',
-      message: 'Please input your password (again).'
-    });
-  };
-
-	render() {
-		const {ver} = this.props;
-		return (
-
-			<Container style={styles.container}>
-        {/*<Header style={{ height: 150 }}>*/}
-        {/*  <Body style={{ alignItems: "center" }}>*/}
-        {/*    /!*<Icon name="cloud" style={{ fontSize: 100 }} />*!/*/}
-        {/*    {platform === "ios" ?*/}
-        {/*      <Image*/}
-        {/*        source={require("../../../../assets/logo-seedauth.png")}*/}
-        {/*        style={{width: 600 / 2.5, height: 172 / 2.5}}*/}
-        {/*      />*/}
-        {/*      :*/}
-        {/*      <Image*/}
-        {/*        source={require("../../../../assets/logo-seedauth-white.png")}*/}
-        {/*        style={{width: 600 / 2.5, height: 172 / 2.5}}*/}
-        {/*      />*/}
-        {/*    }*/}
-        {/*    /!*<Title>SeedAuth Mobile</Title>*!/*/}
-        {/*    <View padder>*/}
-        {/*      <Text style={{ color: Platform.OS === "ios" ? "#000" : "#FFF" }}>*/}
-        {/*        { this.state.message }*/}
-        {/*      </Text>*/}
-        {/*    </View>*/}
-        {/*  </Body>*/}
-        {/*</Header>*/}
-          <PasswordGesture
-            ref={ref => {
-              this.pg = ref;
+  return (
+    <Container style={styles.container}>
+      <Content padder>
+        <Body style={{ alignItems: "center", paddingTop: 20 }}>
+            <Image
+              source={require("../../../../assets/logo-seedauth.png")}
+              style={{width: 600 / 2.5, height: 172 / 2.5}}
+            />
+          <View padder>
+            <Text style={{ color: status === "normal" ? "#0BA3EE" : "red" }}>
+              { message }
+            </Text>
+          </View>
+          <View padder>
+          <ReactNativePinView
+            inputSize={32}
+            ref={pinView}
+            pinLength={4}
+            buttonSize={60}
+            onValueChange={value => setEnteredPin(value)}
+            buttonAreaStyle={{
+              marginTop: 24,
             }}
-            status={this.state.status}
-            message={this.state.message}
-            onStart={() => this.onStart()}
-            onEnd={(password) => this.onEnd(password)}
-            children={
-              <View style={{
-                position: "absolute",
-                bottom: 20,
-                width: Dimensions.get("window").width,
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
-                <Image
-                  source={require("../../../../assets/logo-seedauth-white.png")}
-                  style={{width: 600 / 2.5, height: 172 / 2.5}}
-                />
-              </View>
-            }
+            inputAreaStyle={{
+              marginTop: 24,
+              marginBottom: 24,
+            }}
+            inputViewEmptyStyle={{
+              backgroundColor: "transparent",
+              borderWidth: 1,
+              borderColor: "#0BA3EE",
+            }}
+            inputViewFilledStyle={{
+              backgroundColor: "#0BA3EE",
+            }}
+            buttonViewStyle={{
+              borderWidth: 1,
+              borderColor: "#0BA3EE",
+            }}
+            buttonTextStyle={{
+              color: "#0BA3EE",
+            }}
+            onButtonPress={key => {
+              if (key === "custom_left") {
+                pinView.current.clear();
+              } else if (key === "custom_right") {
+                //
+
+              }
+              // if (key === "three") {
+              //   alert("You can't use 3")
+              // }
+            }}
+            customLeftButton={showRemoveButton ? <Icon name={"ios-backspace"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
+            customRightButton={showCompletedButton ? <Icon name={"ios-unlock"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
           />
+          </View>
+        </Body>
 
+      {/*</Header>*/}
+      {/*<Content padder>*/}
 
-			</Container>
-		);
-	}
+      </Content>
+    </Container>
+  )
 }
+export default Lock
 
-export default Lock;
+// class Lock extends React.Component<Props, State> {
+//   constructor(props) {
+//     super(props);
+//
+//     this.pinView = null;
+//
+//     this.state = {
+//       message: 'Please input your password.',
+//       status: 'normal',
+//       enteredPin: "",
+//     };
+//   }
+//
+//   setEnteredPin = (value) => {
+//     this.setState({
+//       enteredPin: value
+//     });
+//   }
+//
+// 	render() {
+// 		const {ver} = this.props;
+// 		return (
+//
+// 			<Container style={styles.container}>
+//         <Header style={{ height: 150 }}>
+//           <Body style={{ alignItems: "center" }}>
+//             {/*<Icon name="cloud" style={{ fontSize: 100 }} />*/}
+//             {platform === "ios" ?
+//               <Image
+//                 source={require("../../../../assets/logo-seedauth.png")}
+//                 style={{width: 600 / 2.5, height: 172 / 2.5}}
+//               />
+//               :
+//               <Image
+//                 source={require("../../../../assets/logo-seedauth-white.png")}
+//                 style={{width: 600 / 2.5, height: 172 / 2.5}}
+//               />
+//             }
+//             {/*<Title>SeedAuth Mobile</Title>*/}
+//             <View padder>
+//               <Text style={{ color: Platform.OS === "ios" ? "#000" : "#FFF" }}>
+//                 { this.state.message }
+//               </Text>
+//             </View>
+//           </Body>
+//         </Header>
+//         <Content padder>
+//         <ReactNativePinView
+//           ref={ref => {
+//             this.pinView = ref;
+//           }}
+//           inputSize={32}
+//           pinLength={4}
+//           buttonSize={60}
+//           onValueChange={this.setEnteredPin}
+//           buttonAreaStyle={{
+//             marginTop: 24,
+//           }}
+//           inputAreaStyle={{
+//             marginBottom: 24,
+//           }}
+//           inputViewEmptyStyle={{
+//             backgroundColor: "transparent",
+//             borderWidth: 1,
+//             borderColor: "#FFF",
+//           }}
+//           inputViewFilledStyle={{
+//             backgroundColor: "#FFF",
+//           }}
+//           buttonViewStyle={{
+//             borderWidth: 1,
+//             borderColor: "#FFF",
+//           }}
+//           buttonTextStyle={{
+//             color: "#FFF",
+//           }}
+//           onButtonPress={key => {
+//             if (key === "custom_left") {
+//               console.log("pinView: ", this.pinView);
+//               this.pinView.current.clear();
+//
+//             } else if (key === "custom_right") {
+//               alert("Entered Pin: " + this.state.enteredPin)
+//             }
+//
+//             // if (key === "three") {
+//             //   alert("You can't use 3")
+//             // }
+//           }}
+//           customLeftButton={<Icon name={"ios-backspace"} style={{fontSize: 36, color: 'white'}} />}
+//           customRightButton={<Icon name={"ios-unlock"} style={{fontSize: 36, color: 'white'}} />}
+//         />
+//
+//         </Content>
+// 			</Container>
+// 		);
+// 	}
+// }
+//
+// export default Lock;

@@ -79,13 +79,22 @@ class Home extends React.Component<Props, State> {
 
 
         }
-        this.setState({ appState: nextAppState });
+        this.setState({
+            // token: "000000",
+            appState: nextAppState
+        });
     };
 
 
     componentDidMount() {
 
         AppState.addEventListener('change', this._handleAppStateChange);
+
+        AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+            if(lockPass) {
+                this.props.navigation.navigate("Lock");
+            }
+        });
 
         // AsyncStorage.getItem("@ApiKeysStore:period", (err, result) => {
         //   if (err) {
@@ -295,10 +304,10 @@ class Home extends React.Component<Props, State> {
             // alert(result.epoch + " - " + myTime + " = " + diff);
 
             Toast.show({
-                text: "Time sync - Success",
+                text: "Time sync ... OK (diff: " + this.state.timeDiff + " ms)",
                 // buttonText: "OK",
                 type: "success",
-                duration: 2000,
+                duration: 2500,
             });
 
             this.setState({
@@ -399,7 +408,8 @@ class Home extends React.Component<Props, State> {
                     </View>
                     <View padder style={{marginTop: -10}}>
                         <Button block warning onPress={() => this.timeSync()}>
-                            <Text>Time Sync (diff: {this.state.timeDiff > 1000 ? this.state.timeDiff/1000 + "s" : this.state.timeDiff + "ms"})</Text>
+                            {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
+                            <Text>Time Sync</Text>
                         </Button>
                     </View>
                 </Content>

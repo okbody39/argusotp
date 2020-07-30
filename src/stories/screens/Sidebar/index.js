@@ -5,13 +5,13 @@ import { NavigationActions,  StackActions } from "react-navigation";
 // import { DrawerActions } from "react-navigation-drawer";
 
 const routes = [
-	{
-		route: "Home",
-		caption: "Home",
-	},
+	// {
+	// 	route: "Home",
+	// 	caption: "Home",
+	// },
 	{
 		route: "LockSet",
-		caption: "Lock setting",
+		caption: "Pin code",
 	},
   {
     route: "Setting",

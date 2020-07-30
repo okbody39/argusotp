@@ -9,8 +9,6 @@ import Lock from "./container/LockContainer";
 import LockSet from "./container/LockSetContainer";
 import BlankPage from "./container/BlankPageContainer";
 import Sidebar from "./container/SidebarContainer";
-// import Overview from "./container/OverviewContainer";
-// import VMs from "./container/VMsContainer";
 import AuthLoading from "./container/AuthLoadingContainer";
 import Setting from "./container/SettingContainer";
 import ServerInfo from "./container/ServerInfoContainer";
