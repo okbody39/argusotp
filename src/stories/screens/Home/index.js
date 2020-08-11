@@ -43,6 +43,7 @@ class Home extends React.Component<Props, State> {
         this.rdm = Math.floor(Math.random()*(period-1+1)) + 1;
 
         this.state = {
+            title: "SeedAuth",
             token: "000000",
             prevToken: "000000",
             nextToken: "000000",
@@ -87,6 +88,81 @@ class Home extends React.Component<Props, State> {
 
 
     componentDidMount() {
+        const { mainStore } = this.props;
+
+        axios.get(mainStore.getServerUrl() + "/otp/checkConfig/" + mainStore.userToken.userId, {
+            crossdomain: true,
+        }).then(res => {
+            const result = res.data;
+            let jsonText = decrypt(result, mainStore.serverToken.encKey);
+            let jsonObj = JSON.parse(jsonText);
+
+            // alert(jsonText);
+
+            // alert(jsonText+"    ------    "+ JSON.stringify(mainStore.serverToken)+"    ------    "+ JSON.stringify(mainStore.userToken));
+
+            if( jsonObj.digits !== mainStore.serverToken.digits || jsonObj.period !== mainStore.serverToken.period ) {
+                Alert.alert(
+                  'Policy Update',
+                  'Restart app to finish accepting changed policy.',
+                  [
+                      {
+                          text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
+                              Updates.reload();
+                          })
+                      },
+                  ],
+                  { cancelable: false }
+                );
+                return;
+            }
+
+            if (jsonObj.deviceid === "__POLICYCHANGE__") {
+                Alert.alert(
+                  'Policy Update',
+                  'Restart app to finish accepting changed policy.',
+                  [
+                      {
+                          text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
+                              Updates.reload();
+                          })
+                      },
+                  ],
+                  {cancelable: false}
+                );
+                return;
+            } else if (jsonObj.deviceid === "__MISSING__") {
+                clearInterval(this.state.intervalId);
+                this.setState({
+                    token: "000000",
+                });
+
+                Alert.alert(
+                  'Warning',
+                  'Your device is not allowed to access!',
+                  [
+                      {
+                          text: 'Exit', onPress: () => mainStore.resetUserStore().then(() => {
+                              Updates.reload();
+                          })
+                      },
+                  ],
+                  { cancelable: false }
+                );
+                return;
+            }
+
+            let myTime = new Date().valueOf();
+            let diff = jsonObj.epoch - myTime;
+
+            this.setState({
+                timeDiff: diff,
+                title: jsonObj.owner || "SeedAuth",
+            });
+
+        }).catch( reason => {
+            // Alert.alert('Error', reason.message );
+        });
 
         AppState.addEventListener('change', this._handleAppStateChange);
 
@@ -96,60 +172,14 @@ class Home extends React.Component<Props, State> {
             }
         });
 
-        // AsyncStorage.getItem("@ApiKeysStore:period", (err, result) => {
-        //   if (err) {
-        //     return;
-        //   }
-        //   this.setState({period: parseInt(result)});
-        // });
-        //
-        // AsyncStorage.getItem("@ApiKeysStore:digits", (err, result) => {
-        //   if (err) {
-        //     return;
-        //   }
-        //   this.setState({digits: parseInt(result)});
-        // });
-        //
-        // AsyncStorage.getItem("@ApiKeysStore:otpKey", (err, result) => {
-        //   if (err) {
-        //     return;
-        //   }
-        //   this.setState({otpKey: result});
-        // });
-
-        setTimeout(() => {
-            let checkUrl = this.props.mainStore.getServerUrl() + "/otp/epoch/" + this.props.mainStore.userToken.userId;
-
-            // alert(checkUrl);
-
-            axios.get(checkUrl, {
-                crossdomain: true,
-            }).then(res => {
-                const result = res.data;
-                let myTime = new Date().valueOf();
-                let diff = result.epoch - myTime;
-
-                // alert(result.epoch + " - " + myTime + " = " + diff);
-
-                this.setState({
-                    timeDiff: diff,
-                })
-
-            });
-        }, 500);
-
         let secret = this.props.mainStore.userToken.userId + this.props.mainStore.serverToken.otpKey;
         if(secret.length > 14) {
             secret = md5(secret).substr(0, 14);
         }
 
-        // alert(secret);
-
         let intervalId = setInterval(() => {
 
             const { mainStore } = this.props;
-
-            // console.log(settingForm);
 
             if (!mainStore.isServerSet) {
                 return;
@@ -161,6 +191,9 @@ class Home extends React.Component<Props, State> {
                 period: parseInt(mainStore.serverToken.period),
                 epoch: ( new Date().valueOf() + this.state.timeDiff ), //null, // new Date() / 1000,
             };
+
+            // alert(this.props.mainStore.userToken.userId +"---"+ this.props.mainStore.serverToken.otpKey + "---" +secret);
+            // clearInterval(this.state.intervalId);
 
             const otp = new OTP(secret, options);
             const token = otp.getToken();
@@ -178,106 +211,6 @@ class Home extends React.Component<Props, State> {
                 textColor: otp.getTimeUntilNextTick() < 10 ? "#de0607" : "#3b5998",
                 progress: progress,
             });
-
-            if(timeLeft === this.rdm) {
-                // this.prop.mainStore.loadStore().then(() => {
-                //    alert(mainStore.userToken.userId + "/" + mainStore.userToken.deviceId);
-                // });
-
-                // alert(this.rdm);
-
-                let checkUrl = mainStore.getServerUrl() + "/otp/checkMissingDevice/" + mainStore.userToken.userId + "/" + mainStore.userToken.deviceId;
-                let startTime = new Date().valueOf();
-
-                axios.get(checkUrl, {
-                    crossdomain: true,
-                }).then(res => {
-                    const result = res.data;
-
-                    let jsonText = decrypt(result, mainStore.serverToken.encKey);
-                    let jsonObj = JSON.parse(jsonText);
-
-                    // alert(jsonText);
-
-                    if (jsonObj.isMissingDevice === "True") {
-
-                        mainStore.resetStore().then(() => {
-
-                            Alert.alert(
-                                'Warning',
-                                //body
-                                ' Your device is not allowed to access...',
-                                [
-                                    {text: 'Exit', onPress: () => mainStore.resetUserStore().then(() => {
-                                            Updates.reload();
-                                        })},
-                                ],
-                                { cancelable: false }
-                            );
-
-                            // this.props.navigation.dispatch(
-                            //     StackActions.reset(
-                            //         {
-                            //             index: 0,
-                            //             key: null,
-                            //             actions: [NavigationActions.navigate({routeName: "Logout"})],
-                            //         }
-                            //     )
-                            // );
-                        });
-                    } else if (jsonObj.isMissingDevice === "PolicyChanged") {
-                        // let _serverToken = {
-                        //     period: jsonObj.period,
-                        //     digits: jsonObj.digits,
-                        // };
-                        //
-                        // mainStore.saveServerStore(_serverToken);
-
-                        Alert.alert(
-                            'Policy Update',
-                            //body
-                            'Restart app to finish accepting changed policy.',
-                            [
-                                {text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
-                                        Updates.reload();
-                                    })},
-                            ],
-                            { cancelable: false }
-                        );
-
-
-                            // setTimeout(() => {
-                            //     mainStore.resetUserStore().then(() => {
-                            //         Updates.reload();
-                            //     });
-                            // }, 500);
-
-
-                        // loginForm.userToken.userId = loginForm.userId;
-                        // loginForm.userToken.password = loginForm.password;
-                        //
-                        // mainStore.serverToken.otpKey = jsonObj.reason;
-                        // mainStore.serverToken.period = jsonObj.period;
-                        // mainStore.serverToken.digits = jsonObj.digits;
-                        //
-                        // mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
-                        //     // setTimeout(() => {
-                        //     navigation.navigate("AuthLoading");
-                        //     // }, 500);
-                        // });
-
-
-                    } else {
-                        let myTime = new Date().valueOf();
-                        let responseTime = myTime - startTime;
-                        let diff = parseInt( jsonObj.time - ( myTime - ( responseTime * 3 / 4 ) ) );
-
-                        this.setState({
-                            timeDiff: diff,
-                        });
-                    }
-                });
-            }
 
         }, 1000);
 
@@ -304,7 +237,7 @@ class Home extends React.Component<Props, State> {
             // alert(result.epoch + " - " + myTime + " = " + diff);
 
             Toast.show({
-                text: "Time sync ... OK (diff: " + this.state.timeDiff + " ms)",
+                text: "Time sync .. ok (diff: " + diff + " ms)",
                 // buttonText: "OK",
                 type: "success",
                 duration: 2500,
@@ -331,7 +264,7 @@ class Home extends React.Component<Props, State> {
                         </Button>
                     </Left>
                     <Body>
-                        <Title>SeedAuth</Title>
+                        <Title>{ this.state.title }</Title>
                     </Body>
                     <Right />
                 </Header>
@@ -402,12 +335,14 @@ class Home extends React.Component<Props, State> {
                     </Card>
 
                     <View padder>
-                        <Button block onPress={() => this.props.navigation.navigate("ServerInfo")}>
+                        <Button iconLeft rounded block onPress={() => this.props.navigation.navigate("ServerInfo")}>
+                            <Icon name='information-circle' />
                             <Text>Detail Information</Text>
                         </Button>
                     </View>
                     <View padder style={{marginTop: -10}}>
-                        <Button block warning onPress={() => this.timeSync()}>
+                        <Button iconLeft rounded block warning onPress={() => this.timeSync()}>
+                            <Icon name='time' />
                             {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
                             <Text>Time Sync</Text>
                         </Button>

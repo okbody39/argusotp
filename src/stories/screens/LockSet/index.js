@@ -31,7 +31,7 @@ const LockSet = (props) => {
   const [showRemoveButton, setShowRemoveButton] = useState(false);
   const [enteredPin, setEnteredPin] = useState("");
   const [showCompletedButton, setShowCompletedButton] = useState(false);
-  const [message, setMessage] = useState(" ");
+  const [message, setMessage] = useState("Pin code setting");
   const [status, setStatus] = useState("normal");
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const LockSet = (props) => {
       if ( Password1 === '' ) {
         Password1 = enteredPin;
         setStatus( 'normal');
-        setMessage( 'Please input your password secondly.');
+        setMessage( 'Please input your password again.');
 
         pinView.current.clearAll();
 
@@ -57,7 +57,7 @@ const LockSet = (props) => {
           Password1 = '';
 
           Toast.show({
-            text: 'Your password is set successful.',
+            text: 'Your Pin-code set successful.',
             // buttonText: "OK",
             type: "success",
             duration: 2000,
@@ -92,7 +92,7 @@ const LockSet = (props) => {
             AsyncStorage.removeItem("@SeedAuthStore:lockToken");
 
             Toast.show({
-              text: 'Your password clear successful.',
+              text: 'Your Pin-code is disabled.',
               // buttonText: "OK",
               type: "success",
               duration: 2000,
@@ -164,8 +164,8 @@ const LockSet = (props) => {
         />
 
         <View padder style={{marginTop: 10}}>
-          <Button  danger small block onPress={() => clearPincode()}>
-            <Text>Clear Pin code</Text>
+          <Button rounded danger block onPress={() => clearPincode()}>
+            <Text>Disable Pin code</Text>
           </Button>
         </View>
 

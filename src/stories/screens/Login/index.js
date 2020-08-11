@@ -31,7 +31,7 @@ class Login extends React.Component<Props, State> {
 						{/*<Title>SeedAuth Mobile</Title>*/}
 						<View padder>
 							<Text style={{ color: Platform.OS === "ios" ? "#000" : "#FFF" }}>
-								for SeedCloud and SeedVDI
+								for SeedVDI and SeedCloud
 							</Text>
 						</View>
 					</Body>

@@ -31,7 +31,7 @@ class Setting extends React.Component<Props, State> {
 				<Content padder>
 					{this.props.settingForm}
 					<View padder>
-							<Button block onPress={() => this.props.onSave()}>
+							<Button rounded block onPress={() => this.props.onSave()}>
 								<Text>Save</Text>
 							</Button>
 					</View>
