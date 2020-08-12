@@ -76,6 +76,11 @@ class Home extends React.Component<Props, State> {
                 if(lockPass) {
                     this.props.navigation.navigate("Lock");
                 }
+                // else {
+                //     if(this.props.mainStore.serverToken.pincode === "true") {
+                //         this.props.navigation.navigate("LockSet");
+                //     }
+                // }
             });
 
 
@@ -97,11 +102,17 @@ class Home extends React.Component<Props, State> {
             let jsonText = decrypt(result, mainStore.serverToken.encKey);
             let jsonObj = JSON.parse(jsonText);
 
-            // alert(jsonText);
+            // alert(JSON.stringify(mainStore.serverToken));
 
             // alert(jsonText+"    ------    "+ JSON.stringify(mainStore.serverToken)+"    ------    "+ JSON.stringify(mainStore.userToken));
 
-            if( jsonObj.digits !== mainStore.serverToken.digits || jsonObj.period !== mainStore.serverToken.period ) {
+            let remotePincode = jsonObj.pincode || "false";
+            let myPincode = mainStore.serverToken.pincode || "false";
+
+            if( jsonObj.digits !== mainStore.serverToken.digits ||
+                jsonObj.period !== mainStore.serverToken.period ||
+                remotePincode !== myPincode
+            ) {
                 Alert.alert(
                   'Policy Update',
                   'Restart app to finish accepting changed policy.',
@@ -131,6 +142,7 @@ class Home extends React.Component<Props, State> {
                   {cancelable: false}
                 );
                 return;
+
             } else if (jsonObj.deviceid === "__MISSING__") {
                 clearInterval(this.state.intervalId);
                 this.setState({
@@ -169,7 +181,12 @@ class Home extends React.Component<Props, State> {
         AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
             if(lockPass) {
                 this.props.navigation.navigate("Lock");
+            } else {
+                if(this.props.mainStore.serverToken.pincode === "true") {
+                    this.props.navigation.navigate("LockSet");
+                }
             }
+
         });
 
         let secret = this.props.mainStore.userToken.userId + this.props.mainStore.serverToken.otpKey;

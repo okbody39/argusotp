@@ -137,6 +137,7 @@ export default class LoginContainer extends React.Component<Props, State> {
                     mainStore.serverToken.otpKey = jsonObj.reason;
                     mainStore.serverToken.period = jsonObj.period;
                     mainStore.serverToken.digits = jsonObj.digits;
+                    mainStore.serverToken.pincode = jsonObj.pincode || "false";
 
                     mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
                         // setTimeout(() => {

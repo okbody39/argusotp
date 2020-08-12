@@ -33,6 +33,21 @@ const LockSet = (props) => {
   const [showCompletedButton, setShowCompletedButton] = useState(false);
   const [message, setMessage] = useState("Pin code setting");
   const [status, setStatus] = useState("normal");
+  const [mandatory, setMandatory] = useState(false);
+  const [pinCode, setPinCode] = useState(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("@SeedAuthStore:serverToken").then((tokenStr) => {
+      let token = JSON.parse(tokenStr);
+      setMandatory(token.pincode === "true");
+
+      AsyncStorage.getItem("@SeedAuthStore:lockToken").then((code) => {
+        setPinCode(code);
+        // alert(code);
+      });
+
+    });
+  }, [])
 
   useEffect(() => {
     if (enteredPin.length > 0) {
@@ -160,15 +175,23 @@ const LockSet = (props) => {
             }
           }}
           customLeftButton={showRemoveButton ? <Icon name={"ios-backspace"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
-          customRightButton={<Text style={{fontSize: 16, color: '#0BA3EE'}}>Cancel</Text>}
+          customRightButton={
+            mandatory ?
+              pinCode ?
+                <Text style={{fontSize: 16, color: '#0BA3EE'}}>Cancel</Text>
+                : null
+              : <Text style={{fontSize: 16, color: '#0BA3EE'}}>Cancel</Text>
+          }
         />
+        {
+          mandatory ? null :
 
-        <View padder style={{marginTop: 10}}>
-          <Button rounded danger block onPress={() => clearPincode()}>
-            <Text>Disable Pin code</Text>
-          </Button>
-        </View>
-
+            <View padder style={{marginTop: 10}}>
+              <Button rounded danger block onPress={() => clearPincode()}>
+                <Text>Disable Pin code</Text>
+              </Button>
+            </View>
+        }
       </Content>
     </Container>
   )
