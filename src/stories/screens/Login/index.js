@@ -39,7 +39,7 @@ class Login extends React.Component<Props, State> {
 				<Content>
 					{this.props.loginForm}
 					<View padder>
-							<Button block onPress={() => this.props.onLogin()}>
+							<Button rounded block onPress={() => this.props.onLogin()}>
 								<Text>Login</Text>
 							</Button>
 					</View>
@@ -47,7 +47,7 @@ class Login extends React.Component<Props, State> {
 						<Text note style={{ marginBottom: 10 }}>
               This service need setting the server first.
 						</Text>
-						<Button block info onPress={() => this.props.navigation.navigate("PreSetting")}>
+						<Button rounded block info onPress={() => this.props.navigation.navigate("PreSetting")}>
 							<Text>Setting</Text>
 						</Button>
 					</View>
@@ -58,7 +58,7 @@ class Login extends React.Component<Props, State> {
 							{/*<Text style={{ color: "#000" }}>Copyright © DFOCUS All Rights Reserved.</Text>*/}
 						{/*</View>*/}
 						<Image
-							source={{ uri: "http://www.dfocus.net/www/img/logo.jpg" }}
+							source={require("../../../../assets/dfocus-logo.jpg")}
 							style={{ width: 157 / 2, height: 53 / 2 }}
 						/>
 					</View>

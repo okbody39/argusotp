@@ -98,7 +98,7 @@ export default class SettingContainer extends React.Component<Props, State> {
         const Fields = (
             <Form>
                 <Item error={settingForm.serverIpError ? true : false}>
-                    <Icon active name="person" style={{ color: "#00c38b" }}/>
+                    <Icon active name="person" />
                     <Input
                         placeholder="Server IP"
                         placeholderTextColor="#c9c9c9"
@@ -108,7 +108,7 @@ export default class SettingContainer extends React.Component<Props, State> {
                     />
                 </Item>
                 <Item error={settingForm.serverPortError ? true : false}>
-                    <Icon active name="unlock" style={{ color: "#00c38b" }} />
+                    <Icon active name="unlock" />
                     <Input
                         placeholder="Server Port"
                         placeholderTextColor="#c9c9c9"
