@@ -46,12 +46,12 @@ class ServerInfo extends React.Component<Props, State> {
 					</Left>
 
 					<Body style={{ flex: 3 }}>
-						<Title>Detail Inform.</Title>
+						<Title>Detail Inform</Title>
 					</Body>
 
 					<Right>
             <Button transparent onPress={() => this.props.navigation.navigate("Setting")}>
-              <Icon name="ios-cog" style={{fontSize: 30}}/>
+              <Icon type={"FontAwesome"} name="gear" style={{fontSize: 30}}/>
             </Button>
           </Right>
 				</Header>

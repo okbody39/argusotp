@@ -127,7 +127,7 @@ export default class LoginContainer extends React.Component<Props, State> {
                 let jsonText = decrypt(result, mainStore.serverToken.encKey);
                 let jsonObj = JSON.parse(jsonText);
 
-                // alert(jsonText);
+                // alert(jsonObj);
 
                 if (jsonObj.result === "True") {
 
@@ -137,7 +137,8 @@ export default class LoginContainer extends React.Component<Props, State> {
                     mainStore.serverToken.otpKey = jsonObj.reason;
                     mainStore.serverToken.period = jsonObj.period;
                     mainStore.serverToken.digits = jsonObj.digits;
-                    mainStore.serverToken.pincode = jsonObj.pincode || "false";
+                    mainStore.serverToken.pincodeUse = jsonObj.pincodeUse || "false";
+                    mainStore.serverToken.pincodeDigits = jsonObj.pincodeDigits || "4";
 
                     mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
                         // setTimeout(() => {

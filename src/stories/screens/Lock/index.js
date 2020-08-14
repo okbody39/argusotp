@@ -1,6 +1,6 @@
 // import * as React from "react";
 import React, { useEffect, useRef, useState } from "react"
-import {Image, Platform, Dimensions, AsyncStorage} from "react-native";
+import {Image, Platform, Dimensions, AsyncStorage, Alert} from "react-native";
 import {
   Container,
   Header,
@@ -22,6 +22,7 @@ import ReactNativePinView from "react-native-pin-view";
 
 const platform = Platform.OS;
 import styles from "./styles";
+import {Updates} from "expo";
 // import {Image} from "../Login";
 // import pkg from "package";
 
@@ -32,6 +33,19 @@ const Lock = (props) => {
   const [showCompletedButton, setShowCompletedButton] = useState(false);
   const [message, setMessage] = useState(" ");
   const [status, setStatus] = useState("normal");
+  const [mandatory, setMandatory] = useState(false);
+  const [digits, setDigits] = useState(4);
+
+
+  useEffect(() => {
+    AsyncStorage.getItem("@SeedAuthStore:serverToken").then((tokenStr) => {
+      let token = JSON.parse(tokenStr);
+
+      setMandatory(token.pincodeUse === "true");
+      setDigits(parseInt(token.pincodeDigits || "4"));
+
+    });
+  }, []);
 
   useEffect(() => {
     if (enteredPin.length > 0) {
@@ -39,7 +53,7 @@ const Lock = (props) => {
     } else {
       setShowRemoveButton(false);
     }
-    if (enteredPin.length === 4) {
+    if (enteredPin.length === digits) {
       AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
         if (enteredPin == lockPass) {
           setStatus( 'normal');
@@ -57,63 +71,72 @@ const Lock = (props) => {
     }
   }, [enteredPin]);
 
-
   return (
     <Container style={styles.container}>
       <Content padder>
         <Body style={{ alignItems: "center", paddingTop: 20 }}>
-            <Image
-              source={require("../../../../assets/logo-seedauth.png")}
-              style={{width: 600 / 2.5, height: 172 / 2.5}}
-            />
+          <Image
+            source={require("../../../../assets/logo-seedauth.png")}
+            style={{
+              width: 600 / 2.5,
+              height: 172 / 2.5,
+              marginBottom: 20
+            }}
+          />
           <View padder>
-            <Text style={{ color: status === "normal" ? "#0BA3EE" : "red" }}>
+            <Text style={{
+              color: status === "normal" ? "#0BA3EE" : "red"
+            }}>
               { message }
             </Text>
           </View>
           <View padder>
-          <ReactNativePinView
-            inputSize={32}
-            ref={pinView}
-            pinLength={4}
-            buttonSize={60}
-            onValueChange={value => setEnteredPin(value)}
-            buttonAreaStyle={{
-              marginTop: 24,
-            }}
-            inputAreaStyle={{
-              marginTop: 24,
-              marginBottom: 24,
-            }}
-            inputViewEmptyStyle={{
-              backgroundColor: "transparent",
-              borderWidth: 1,
-              borderColor: "#0BA3EE",
-            }}
-            inputViewFilledStyle={{
-              backgroundColor: "#0BA3EE",
-            }}
-            buttonViewStyle={{
-              borderWidth: 1,
-              borderColor: "#0BA3EE",
-            }}
-            buttonTextStyle={{
-              color: "#0BA3EE",
-            }}
-            onButtonPress={key => {
-              if (key === "custom_left") {
-                pinView.current.clear();
-              } else if (key === "custom_right") {
-                //
+            {
+              digits ?
+                <ReactNativePinView
+                  inputSize={ digits === 4 ? 32 : 20}
+                  ref={pinView}
+                  pinLength={ digits }
+                  buttonSize={60}
+                  onValueChange={value => setEnteredPin(value)}
+                  buttonAreaStyle={{
+                    marginTop: 24,
+                  }}
+                  inputAreaStyle={{
+                    marginTop: 24,
+                    marginBottom: 24,
+                  }}
+                  inputViewEmptyStyle={{
+                    backgroundColor: "transparent",
+                    borderWidth: 1,
+                    borderColor: "#0BA3EE",
+                  }}
+                  inputViewFilledStyle={{
+                    backgroundColor: "#0BA3EE",
+                  }}
+                  buttonViewStyle={{
+                    borderWidth: 1,
+                    borderColor: "#0BA3EE",
+                  }}
+                  buttonTextStyle={{
+                    color: "#0BA3EE",
+                  }}
+                  onButtonPress={key => {
+                    if (key === "custom_left") {
+                      pinView.current.clear();
+                    } else if (key === "custom_right") {
+                      //
 
-              }
-              // if (key === "three") {
-              //   alert("You can't use 3")
-              // }
-            }}
-            customLeftButton={showRemoveButton ? <Icon name={"ios-backspace"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
-            customRightButton={showCompletedButton ? <Icon name={"ios-unlock"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
-          />
+                    }
+                    // if (key === "three") {
+                    //   alert("You can't use 3")
+                    // }
+                  }}
+                  customLeftButton={showRemoveButton ? <Icon name={"ios-backspace"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
+                  customRightButton={showCompletedButton ? <Icon name={"ios-unlock"} style={{fontSize: 36, color: '#0BA3EE'}} /> : undefined}
+                /> : null
+            }
+
           </View>
         </Body>
 

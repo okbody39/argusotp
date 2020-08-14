@@ -73,6 +73,12 @@ class Home extends React.Component<Props, State> {
             // });
 
             AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+
+                if(mainStore.serverToken.pincodeDigits !== lockPass.length) {
+                    this.props.navigation.navigate("LockSet");
+                    return;
+                }
+
                 if(lockPass) {
                     this.props.navigation.navigate("Lock");
                 }
@@ -95,6 +101,7 @@ class Home extends React.Component<Props, State> {
     componentDidMount() {
         const { mainStore } = this.props;
 
+
         axios.get(mainStore.getServerUrl() + "/otp/checkConfig/" + mainStore.userToken.userId, {
             crossdomain: true,
         }).then(res => {
@@ -103,15 +110,23 @@ class Home extends React.Component<Props, State> {
             let jsonObj = JSON.parse(jsonText);
 
             // alert(JSON.stringify(mainStore.serverToken));
-
+            //
             // alert(jsonText+"    ------    "+ JSON.stringify(mainStore.serverToken)+"    ------    "+ JSON.stringify(mainStore.userToken));
 
-            let remotePincode = jsonObj.pincode || "false";
-            let myPincode = mainStore.serverToken.pincode || "false";
+            // alert(JSON.stringify(jsonObj.pincode) +" /// "+ JSON.stringify(mainStore.serverToken.pincode));
+
+            // alert(jsonObj.pincode);
+
+            let remotePincode = jsonObj.pincodeUse || "false";
+            let myPincode = mainStore.serverToken.pincodeUse || "false";
+
+            let remotePincodeDigits = jsonObj.pincodeDigits || "4";
+            let myPincodeDigits = mainStore.serverToken.pincodeDigits || "4";
 
             if( jsonObj.digits !== mainStore.serverToken.digits ||
                 jsonObj.period !== mainStore.serverToken.period ||
-                remotePincode !== myPincode
+                remotePincode !== myPincode ||
+                remotePincodeDigits !== myPincodeDigits
             ) {
                 Alert.alert(
                   'Policy Update',
@@ -119,7 +134,14 @@ class Home extends React.Component<Props, State> {
                   [
                       {
                           text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
-                              Updates.reload();
+                              if (remotePincodeDigits !== myPincodeDigits) {
+                                  AsyncStorage.removeItem("@SeedAuthStore:lockToken").then(() => {
+                                      Updates.reload();
+                                  });
+                              } else {
+                                  Updates.reload();
+                              }
+
                           })
                       },
                   ],
@@ -164,16 +186,19 @@ class Home extends React.Component<Props, State> {
                 return;
             }
 
-            let myTime = new Date().valueOf();
-            let diff = jsonObj.epoch - myTime;
+            setTimeout(() => {
+                let myTime = new Date().valueOf();
+                let diff = jsonObj.epoch - myTime;
 
-            this.setState({
-                timeDiff: diff,
-                title: jsonObj.owner || "SeedAuth",
-            });
+                this.setState({
+                    timeDiff: diff,
+                    title: jsonObj.owner || "SeedAuth",
+                });
+            }, 500);
 
-        }).catch( reason => {
-            // Alert.alert('Error', reason.message );
+        // }).catch( reason => {
+        //     Alert.alert('Error', reason.message );
+        //     console.log(reason.message);
         });
 
         AppState.addEventListener('change', this._handleAppStateChange);
@@ -182,7 +207,7 @@ class Home extends React.Component<Props, State> {
             if(lockPass) {
                 this.props.navigation.navigate("Lock");
             } else {
-                if(this.props.mainStore.serverToken.pincode === "true") {
+                if(this.props.mainStore.serverToken.pincodeUse === "true") {
                     this.props.navigation.navigate("LockSet");
                 }
             }
@@ -352,14 +377,14 @@ class Home extends React.Component<Props, State> {
                     </Card>
 
                     <View padder>
-                        <Button iconLeft rounded block onPress={() => this.props.navigation.navigate("ServerInfo")}>
-                            <Icon name='information-circle' />
+                        <Button rounded block onPress={() => this.props.navigation.navigate("ServerInfo")}>
+                            {/*<Icon name='information-circle' />*/}
                             <Text>Detail Information</Text>
                         </Button>
                     </View>
                     <View padder style={{marginTop: -10}}>
-                        <Button iconLeft rounded block warning onPress={() => this.timeSync()}>
-                            <Icon name='time' />
+                        <Button rounded block warning onPress={() => this.timeSync()}>
+                            {/*<Icon name='time' />*/}
                             {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
                             <Text>Time Sync</Text>
                         </Button>
