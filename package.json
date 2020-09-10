@@ -1,6 +1,6 @@
 {
   "name": "SeedAuth-Mobile",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "private": true,
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.5",

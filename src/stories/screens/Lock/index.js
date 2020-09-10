@@ -55,18 +55,25 @@ const Lock = (props) => {
     }
     if (enteredPin.length === digits) {
       AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
-        if (enteredPin == lockPass) {
-          setStatus( 'normal');
-          setMessage("");
-          pinView.current.clearAll();
+        if(lockPass.length === digits) {
+          if (enteredPin == lockPass) {
+            setStatus( 'normal');
+            setMessage("");
+            pinView.current.clearAll();
 
-          props.navigation.navigate("Home");
+            props.navigation.navigate("Home");
 
+          } else {
+            setStatus( 'error');
+            setMessage("Password is wrong, try again.");
+            pinView.current.clearAll();
+          }
         } else {
-          setStatus( 'error');
-          setMessage("Password is wrong, try again.");
-          pinView.current.clearAll();
+          AsyncStorage.removeItem("@SeedAuthStore:lockToken");
+          Alert.alert("Policy change", "PIN code policy is changed! please set again...");
+          props.navigation.navigate("LockSet");
         }
+
       });
     }
   }, [enteredPin]);

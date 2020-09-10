@@ -74,7 +74,7 @@ class Home extends React.Component<Props, State> {
 
             AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
 
-                if(mainStore.serverToken.pincodeDigits !== lockPass.length) {
+                if(this.props.mainStore.serverToken.pincodeDigits != lockPass.length) {
                     this.props.navigation.navigate("LockSet");
                     return;
                 }
@@ -82,11 +82,15 @@ class Home extends React.Component<Props, State> {
                 if(lockPass) {
                     this.props.navigation.navigate("Lock");
                 }
+
                 // else {
                 //     if(this.props.mainStore.serverToken.pincode === "true") {
                 //         this.props.navigation.navigate("LockSet");
                 //     }
                 // }
+
+
+
             });
 
 
