@@ -220,6 +220,7 @@ class Home extends React.Component<Props, State> {
 
         let secret = this.props.mainStore.userToken.userId + this.props.mainStore.serverToken.otpKey;
         if(secret.length > 14) {
+            secret = secret.toLowerCase();
             secret = md5(secret).substr(0, 14);
         }
 
