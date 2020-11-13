@@ -23,6 +23,7 @@ import ReactNativePinView from "react-native-pin-view";
 const platform = Platform.OS;
 import styles from "./styles";
 import {Updates} from "expo";
+import axios from "axios";
 // import {Image} from "../Login";
 // import pkg from "package";
 
@@ -38,6 +39,9 @@ const Lock = (props) => {
 
 
   useEffect(() => {
+
+    // Alert.alert(JSON.stringify(props.navigation.state.params.userid));
+
     AsyncStorage.getItem("@SeedAuthStore:serverToken").then((tokenStr) => {
       let token = JSON.parse(tokenStr);
 
@@ -64,6 +68,31 @@ const Lock = (props) => {
             props.navigation.navigate("Home");
 
           } else {
+            AsyncStorage.getItem("@SeedAuthStore:lockErrorCount").then((errCount) => {
+              let cnt = parseInt(errCount || "0") + 1;
+              if(cnt >= 5) { // 5회 오류시
+                Alert.alert("Error count exceeded", "Initialize the app due to the exceeded error count...");
+
+                let mainStore = props.navigation.state.params.mainStore;
+
+                let serverUrl = mainStore.getServerUrl() || "";
+                let userid = mainStore.userToken.userId || "";
+                let checkUrl = serverUrl + "/lockuser/" + userid;
+
+                axios.get(checkUrl, {
+                  crossdomain: true,
+                }).then(res => {
+                  mainStore.resetUserStore().then(() => {
+                    Updates.reload();
+                  });
+                });
+
+
+              } else {
+                AsyncStorage.setItem("@SeedAuthStore:lockErrorCount",  "" + cnt);
+              }
+            });
+
             setStatus( 'error');
             setMessage("Password is wrong, try again.");
             pinView.current.clearAll();

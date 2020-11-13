@@ -80,7 +80,11 @@ class Home extends React.Component<Props, State> {
                 }
 
                 if(lockPass) {
-                    this.props.navigation.navigate("Lock");
+                    this.props.navigation.navigate("Lock", {
+                        mainStore: this.props.mainStore,
+                        // serverUrl: this.props.mainStore.getServerUrl(),
+                        // userid: this.props.mainStore.userToken.userId,
+                    });
                 }
 
                 // else {
@@ -209,7 +213,11 @@ class Home extends React.Component<Props, State> {
 
         AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
             if(lockPass) {
-                this.props.navigation.navigate("Lock");
+                this.props.navigation.navigate("Lock", {
+                    mainStore: this.props.mainStore,
+                    // serverUrl: this.props.mainStore.getServerUrl(),
+                    // userid: this.props.mainStore.userToken.userId,
+                });
             } else {
                 if(this.props.mainStore.serverToken.pincodeUse === "true") {
                     this.props.navigation.navigate("LockSet");
