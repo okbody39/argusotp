@@ -65,6 +65,8 @@ const Lock = (props) => {
             setMessage("");
             pinView.current.clearAll();
 
+            AsyncStorage.setItem("@SeedAuthStore:lockErrorCount",  "0");
+
             props.navigation.navigate("Home");
 
           } else {
