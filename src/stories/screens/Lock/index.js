@@ -73,22 +73,29 @@ const Lock = (props) => {
             AsyncStorage.getItem("@SeedAuthStore:lockErrorCount").then((errCount) => {
               let cnt = parseInt(errCount || "0") + 1;
               if(cnt >= 5) { // 5회 오류시
-                Alert.alert("Error count exceeded", "Initialize the app due to the exceeded error count...");
+                Alert.alert("Error count exceeded",
+                  "Initialize the app due to the exceeded error count...",
+                  [
+                    { text: 'OK', onPress: () => {
+                        let mainStore = props.navigation.state.params.mainStore;
 
-                let mainStore = props.navigation.state.params.mainStore;
+                        let serverUrl = mainStore.getServerUrl() || "";
+                        let userid = mainStore.userToken.userId || "";
+                        let checkUrl = serverUrl + "/otp/lockuser/" + userid;
 
-                let serverUrl = mainStore.getServerUrl() || "";
-                let userid = mainStore.userToken.userId || "";
-                let checkUrl = serverUrl + "/lockuser/" + userid;
-
-                axios.get(checkUrl, {
-                  crossdomain: true,
-                }).then(res => {
-                  mainStore.resetUserStore().then(() => {
-                    Updates.reload();
-                  });
-                });
-
+                        axios.get(checkUrl, {
+                          crossdomain: true,
+                        }).then(res => {
+                        }).catch(err => {
+                        }).finally(() => {
+                          mainStore.resetStore().then(() => {
+                            Updates.reload();
+                          });
+                        });
+                      }
+                    }
+                  ],
+                  { cancelable: false });
 
               } else {
                 AsyncStorage.setItem("@SeedAuthStore:lockErrorCount",  "" + cnt);

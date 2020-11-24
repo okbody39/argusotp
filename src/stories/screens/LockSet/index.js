@@ -201,11 +201,10 @@ const LockSet = (props) => {
         {
           mandatory ? null :
 
-            <View padder style={{marginTop: 10}}>
-              <Button rounded danger block onPress={() => clearPincode()}>
-                <Text>Disable Pin code</Text>
-              </Button>
-            </View>
+            <Button rounded danger block onPress={() => clearPincode()}>
+              <Text>Disable Pin code</Text>
+            </Button>
+
         }
       </Content>
     </Container>
