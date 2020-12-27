@@ -3,19 +3,20 @@ import { Updates } from 'expo';
 import {
     Container, Header, Title, Content,
     Text, Button, Icon, Left, Body, Right,
-    List, ListItem, Row, Col,
+    List, ListItem, Row, Col, Grid,
     Card, CardItem, Toast,
-    H1, H2, H3, View
+    H1, H2, H3, View, Form, Item, Input
 } from "native-base";
 
 import styles from "./styles";
 // import Sparkline from "react-native-sparkline";
 import ProgressBar from "react-native-progress-bar";
+import CardFlip from 'react-native-card-flip';
 
 import OTP from "otp-client";
 import md5 from "md5";
 
-import {AsyncStorage, Dimensions, Alert, AppState} from "react-native";
+import {AsyncStorage, Dimensions, Alert, AppState, TouchableOpacity} from "react-native";
 
 // const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -27,13 +28,7 @@ import {NavigationActions, StackActions} from "react-navigation";
 
 // var ProgressBar = require("react-native-progress-bar");
 
-export interface Props {
-    navigation: any;
-    userId: any,
-}
-export interface State {}
-
-class Home extends React.Component<Props, State> {
+class Home extends React.Component {
 
     constructor(props) {
         super(props);
@@ -43,7 +38,7 @@ class Home extends React.Component<Props, State> {
         this.rdm = Math.floor(Math.random()*(period-1+1)) + 1;
 
         this.state = {
-            title: "SeedAuth",
+            title: "ArgusOTP",
             token: "000000",
             prevToken: "000000",
             nextToken: "000000",
@@ -54,6 +49,8 @@ class Home extends React.Component<Props, State> {
             progress: 0,
             timeDiff: 0,
             appState: AppState.currentState,
+            isFlipped: false,
+            settingMode: false,
         };
 
     }
@@ -307,102 +304,202 @@ class Home extends React.Component<Props, State> {
 
     render() {
         return (
-            <Container style={styles.container}>
-                <Header>
-                    <Left>
-                        <Button transparent>
-                            <Icon
-                                active
-                                name="menu"
-                                onPress={() => this.props.navigation.toggleDrawer()}
-                            />
-                        </Button>
-                    </Left>
-                    <Body>
-                        <Title>{ this.state.title }</Title>
-                    </Body>
-                    <Right />
-                </Header>
+            <Container style={styles.container}  style={{ backgroundColor: "#2D2B2C" }}>
+
+                {/*<Header>*/}
+                {/*    <Left>*/}
+                {/*        <Button transparent>*/}
+                {/*            <Icon*/}
+                {/*                active*/}
+                {/*                name="menu"*/}
+                {/*                onPress={() => this.props.navigation.toggleDrawer()}*/}
+                {/*            />*/}
+                {/*        </Button>*/}
+                {/*    </Left>*/}
+                {/*    <Body>*/}
+                {/*        <Title>{ this.state.title }</Title>*/}
+                {/*    </Body>*/}
+                {/*    <Right />*/}
+                {/*</Header>*/}
 
                 <Content padder>
-                    <Card style={{ alignItems: "center", paddingTop: 30 }}>
-                        <H3 style={{color: "grey"}}>
-                            VERIFY YOUR
-                        </H3>
-                        <H3 style={{color: "grey"}}>
-                            PASSWORD
-                        </H3>
-                        {/*<CardItem header>*/}
-                        {/*<Text>{this.props.userId}</Text>*/}
-                        {/*</CardItem>*/}
-                        {/*<CardItem>*/}
-                        {/*<Body>*/}
-                        {/*<TextLetterSpacing*/}
-                        {/*spacing={3}*/}
-                        {/*viewStyle={{ marginLeft: 15 }}*/}
-                        {/*textStyle={{*/}
-                        {/*fontSize: 35,*/}
-                        {/*color: "lightgrey"*/}
-                        {/*}}*/}
-                        {/*>*/}
-                        {/*{this.state.prevToken}*/}
-                        {/*</TextLetterSpacing>*/}
 
-                        <TextLetterSpacing
-                            spacing={2}
-                            // viewStyle={{ paddingTop: 10 }}
-                            textStyle={{
-                                fontSize: 42,
-                                color: this.state.textColor,
-                                marginTop: 15,
-                                marginBottom: 10
-                            }}
-                        >
-                            { this.state.token }
-                        </TextLetterSpacing>
+                    <Body style={{ marginTop: 20, marginBottom: 25 }}>
+                        <Title style={{ color: "#60B0F4", fontWeight: "bold", fontSize: 22 }}>{ this.state.title }</Title>
+                    </Body>
 
-                        {/*<TextLetterSpacing*/}
-                        {/*spacing={3}*/}
-                        {/*viewStyle={{ marginLeft: 15 }}*/}
-                        {/*textStyle={{*/}
-                        {/*fontSize: 35,*/}
-                        {/*color: "lightgrey"*/}
-                        {/*}}*/}
-                        {/*>*/}
-                        {/*{this.state.nextToken}*/}
-                        {/*</TextLetterSpacing>*/}
-                        <ProgressBar
-                            fillStyle={{backgroundColor: this.state.textColor}}
-                            backgroundStyle={{backgroundColor: "#cccccc", borderRadius: 2}}
-                            style={{marginTop: 10, width: deviceWidth * 0.8 }}
-                            progress={this.state.progress}
-                        />
-                        {/*</Body>*/}
-                        {/*</CardItem>*/}
-                        <CardItem>
-                            <Row>
-                                <Left/>
-                                <Right style={{flex: 3}}>
-                                    <Text note>{this.state.nextTokenSecond} second(s) left</Text>
-                                </Right>
-                            </Row>
-                        </CardItem>
-                    </Card>
+                    <View style={{ padding: 4}}>
+                    <CardFlip ref={(card) => this.card = card}  style={{
+                        // width: 320,
+                        height: 200,
+                    }}>
+                        <TouchableOpacity style={{
+                            // width: 320,
+                            height: 200,
+                            // backgroundColor: 'white',
+                            // borderRadius: 5,
+                            // shadowColor: 'rgba(0,0,0,0.5)',
+                            // shadowOffset: {
+                            //     width: 0,
+                            //     height: 1,
+                            // },
+                            // shadowOpacity: 0.5,
+                        }} onPress={() => {
+                            this.card.flip();
+                            setTimeout(() => {
+                                this.card.flip();
+                            }, 10000);
+                        }} >
+                            <Card style={{ justifyContent: "center", height: 200, borderRadius: 10 }} >
+                                <CardItem>
+                                    <Body style={{ alignItems: "center" }} >
+                                        <H3 style={{ color: "grey", marginBottom: 8 }}>
+                                            CHECK PASSWORD
+                                        </H3>
+                                        <H2 style={{ color: "grey", marginBottom: 0, fontWeight: "bold" }}>
+                                            CLICK!
+                                        </H2>
+                                        <Icon type="FontAwesome5" active name="hand-point-up" style={{ color: "lightgray", fontSize: 60 }} />
+                                    </Body>
+                                </CardItem>
+                                {/*<H3 style={{color: "grey"}}>*/}
+                                {/*    VERIFY YOUR*/}
+                                {/*</H3>*/}
+                                {/*<H3 style={{color: "grey"}}>*/}
+                                {/*    PASSWORD*/}
+                                {/*</H3>*/}
+                            </Card>
+                        </TouchableOpacity>
+                        {/*<TouchableOpacity style={{*/}
+                        {/*    height: 200,*/}
+                        {/*    // backgroundColor: 'white',*/}
+                        {/*    // borderRadius: 5,*/}
+                        {/*    // shadowColor: 'rgba(0,0,0,0.5)',*/}
+                        {/*    // shadowOffset: {*/}
+                        {/*    //     width: 0,*/}
+                        {/*    //     height: 1,*/}
+                        {/*    // },*/}
+                        {/*    // shadowOpacity: 0.5,*/}
+                        {/*}} onPress={() => this.card.flip()} >*/}
+                            <Card style={{ alignItems: "center", justifyContent: "center", height: 200, borderRadius: 10 }}>
+                                {/*<H3 style={{color: "grey"}}>*/}
+                                {/*    VERIFY YOUR*/}
+                                {/*</H3>*/}
+                                {/*<H3 style={{color: "grey"}}>*/}
+                                {/*    PASSWORD*/}
+                                {/*</H3>*/}
+                                {/*<CardItem header>*/}
+                                {/*<Text>{this.props.userId}</Text>*/}
+                                {/*</CardItem>*/}
+                                {/*<CardItem>*/}
+                                {/*<Body>*/}
+                                {/*<TextLetterSpacing*/}
+                                {/*spacing={3}*/}
+                                {/*viewStyle={{ marginLeft: 15 }}*/}
+                                {/*textStyle={{*/}
+                                {/*fontSize: 35,*/}
+                                {/*color: "lightgrey"*/}
+                                {/*}}*/}
+                                {/*>*/}
+                                {/*{this.state.prevToken}*/}
+                                {/*</TextLetterSpacing>*/}
 
-                    <View padder>
-                        <Button rounded block onPress={() => this.props.navigation.navigate("ServerInfo")}>
-                            {/*<Icon name='information-circle' />*/}
-                            <Text>Detail Information</Text>
-                        </Button>
+                                <TextLetterSpacing
+                                    spacing={2}
+                                    // viewStyle={{ paddingTop: 10 }}
+                                    textStyle={{
+                                        fontSize: 42,
+                                        color: this.state.textColor,
+                                        marginTop: 15,
+                                        marginBottom: 10
+                                    }}
+                                >
+                                    { this.state.token }
+                                </TextLetterSpacing>
+
+                                {/*<TextLetterSpacing*/}
+                                {/*spacing={3}*/}
+                                {/*viewStyle={{ marginLeft: 15 }}*/}
+                                {/*textStyle={{*/}
+                                {/*fontSize: 35,*/}
+                                {/*color: "lightgrey"*/}
+                                {/*}}*/}
+                                {/*>*/}
+                                {/*{this.state.nextToken}*/}
+                                {/*</TextLetterSpacing>*/}
+                                <ProgressBar
+                                    fillStyle={{backgroundColor: this.state.textColor}}
+                                    backgroundStyle={{backgroundColor: "#cccccc", borderRadius: 2}}
+                                    style={{marginTop: 10, width: deviceWidth * 0.7 }}
+                                    progress={this.state.progress}
+                                />
+                                {/*</Body>*/}
+                                {/*</CardItem>*/}
+                                <CardItem>
+                                    <Row>
+                                        <Left/>
+                                        <Right style={{ marginRight: 13 }}>
+                                            <Text note>{this.state.nextTokenSecond} second(s) left</Text>
+                                        </Right>
+                                    </Row>
+                                </CardItem>
+                            </Card>
+                        {/*</TouchableOpacity>*/}
+                    </CardFlip>
                     </View>
-                    <View padder style={{marginTop: -10}}>
-                        <Button rounded block warning onPress={() => this.timeSync()}>
-                            {/*<Icon name='time' />*/}
-                            {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
-                            <Text>Time Sync</Text>
-                        </Button>
-                    </View>
+
+
+
                 </Content>
+
+                <View padder style={{ backgroundColor: "#2D2B2C" }}>
+                    <View padder style={{
+                        backgroundColor: "#60B0F4", borderTopLeftRadius: 30, borderTopRightRadius: 30,
+                        height: this.state.settingMode ? 300 : 65 }} >
+                        {/*<View style={{width: 80, height: 8, borderRadius: 5, backgroundColor: "lightgray"}}></View>*/}
+                        <Button transparent block info onPress={() => this.setState({settingMode : !this.state.settingMode})}>
+                            <Text style={{ color: "white", fontWeight: "bold" }}>MENU</Text>
+                        </Button>
+                        {
+                            this.state.settingMode ?
+                                <View>
+                                <View padder>
+                                    <Button rounded block
+                                            style={{ backgroundColor: "#2D2B2C", marginBottom: 8 }}
+                                            onPress={() => this.props.navigation.navigate("ServerInfo")} >
+                                        {/*<Icon name='information-circle' />*/}
+                                        <Text>Detail Information</Text>
+                                    </Button>
+                                {/*</View>*/}
+                                {/*<View padder style={{ marginTop: -10 }}>*/}
+                                    <Button rounded block
+                                            style={{ backgroundColor: "#2D2B2C", marginBottom: 8 }}
+                                            onPress={() => this.timeSync()} >
+                                        {/*<Icon name='time' />*/}
+                                        {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
+                                        <Text>Time Sync</Text>
+                                    </Button>
+                                    <Button rounded block
+                                            danger
+                                            // style={{ backgroundColor: "#2D2B2C" }}
+                                            onPress={() => this.props.navigation.dispatch(
+                                                StackActions.reset({
+                                                        index: 0,
+                                                        key: null,
+                                                        actions: [NavigationActions.navigate({routeName: "Logout"})],
+                                                    })
+                                                )} >
+                                        {/*<Icon name='time' />*/}
+                                        {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
+                                        <Text>Logout</Text>
+                                    </Button>
+
+                                </View>
+                                </View>
+                                : null
+                        }
+                    </View>
+                </View>
             </Container>
         );
     }

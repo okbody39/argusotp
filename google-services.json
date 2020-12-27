@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:36368506036:android:4a9aeee4a43ccc48",
         "android_client_info": {
-          "package_name": "net.dfocus.seedauth"
+          "package_name": "kr.co.cielcloud.argusotp"
         }
       },
       "oauth_client": [

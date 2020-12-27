@@ -3,14 +3,7 @@ import { Image, Platform } from "react-native";
 import { Container, Content, Header, Body, Title, Button, Text, View, Icon, Footer, Row, Left, Right } from "native-base";
 import styles from "./styles";
 
-export interface Props {
-  settingForm: any,
-	onSave: Function,
-  navigation: any,
-}
-
-export interface State {}
-class Setting extends React.Component<Props, State> {
+class Setting extends React.Component {
 	render() {
 		return (
       <Container style={styles.container}>

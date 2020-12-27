@@ -9,11 +9,11 @@ import { encrypt, decrypt} from "../../utils/crypt";
 import Setting from "../../stories/screens/Setting";
 import {NavigationActions, StackActions} from "react-navigation";
 
-export interface Props {
-    navigation: any,
-    settingForm: any,
-}
-export interface State {}
+// export interface Props {
+//     navigation: any,
+//     settingForm: any,
+// }
+// export interface State {}
 
 const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 const resetAction = StackActions.reset();
@@ -25,7 +25,7 @@ const resetAction = StackActions.reset();
 
 @inject("settingForm", "mainStore")
 @observer
-export default class SettingContainer extends React.Component<Props, State> {
+export default class SettingContainer extends React.Component {
     serverIpInput: any;
     serverPortInput: any;
 

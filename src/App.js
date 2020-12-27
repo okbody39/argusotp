@@ -36,56 +36,47 @@ const Drawer = createDrawerNavigator(
 );
 
 const AppStack = createStackNavigator(
-		{
-      Login: { screen: Login },
-      Logout: { screen: Login },
-			Lock: { screen: Lock },
-			LockSet: { screen: LockSet },
-			BlankPage: { screen: BlankPage },
-			ServerInfo: { screen: ServerInfo },
-      Setting: { screen: Setting },
-			Drawer: { screen: Drawer },
-		},
-		{
-			initialRouteName: "Drawer",
-			headerMode: "none",
-		}
-	);
+	{
+		Login: { screen: Login },
+		Logout: { screen: Login },
+		Lock: { screen: Lock },
+		LockSet: { screen: LockSet },
+		BlankPage: { screen: BlankPage },
+		ServerInfo: { screen: ServerInfo },
+		Setting: { screen: Setting },
+		Drawer: { screen: Drawer },
+	},
+	{
+		initialRouteName: "Drawer",
+		headerMode: "none",
+	}
+);
 
 const AuthStack = createStackNavigator(
-		{
-      Login:  { screen: Login },
-			Lock: { screen: Lock },
-      PreSetting: { screen: Setting },
-      AuthLoading:  { screen: AuthLoading },
-      App: { screen: AppStack },
-		},
-    {
-      initialRouteName: "Login",
-      headerMode: "none",
-    }
-	);
+	{
+		Login:  { screen: Login },
+		Lock: { screen: Lock },
+		PreSetting: { screen: Setting },
+		AuthLoading:  { screen: AuthLoading },
+		App: { screen: AppStack },
+	},
+	{
+		initialRouteName: "Login",
+		headerMode: "none",
+	}
+);
 
 const AuthSwitch = createStackNavigator(
-  {
-    AuthLoading:  { screen: AuthLoading },
-    App: { screen: AppStack },
-    Auth: { screen: AuthStack },
-  },
-  {
-    initialRouteName: "AuthLoading",
-    headerMode: "none",
-  }
+	{
+		AuthLoading:  { screen: AuthLoading },
+		App: { screen: AppStack },
+		Auth: { screen: AuthStack },
+		Logout: { screen: Login },
+	},
+	{
+		initialRouteName: "AuthLoading",
+		headerMode: "none",
+	}
 );
-//
-// class App extends React.Component {
-//   render() {
-//     return (
-//       <Root>
-//       	<AuthSwitch />
-//       </Root>
-// 		);
-//   }
-// }
 
 export default createAppContainer(AuthSwitch);

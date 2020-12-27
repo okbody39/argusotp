@@ -12,14 +12,14 @@ import {NavigationActions, StackActions} from "react-navigation";
 import {decrypt} from "../../utils/crypt";
 import Expo, { Constants } from "expo";
 
-export interface Props {
-	navigation: any,
-}
-export interface State {}
+// export interface Props {
+// 	navigation: any,
+// }
+// export interface State {}
 
 @inject("mainStore")
 @observer
-export default class AuthLoadingContainer extends React.Component<Props, State> {
+export default class AuthLoadingContainer extends React.Component {
   constructor(props) {
     super(props);
     this._bootstrapAsync();
@@ -38,7 +38,7 @@ export default class AuthLoadingContainer extends React.Component<Props, State> 
     // }
 
     mainStore.loadStore().then(() => {
-      var routName = mainStore.isLogin ? "App" : "Auth";
+      let routName = mainStore.isLogin ? "App" : "Auth";
 
       // if (mainStore.isServerSet && mainStore.userToken) {
 
