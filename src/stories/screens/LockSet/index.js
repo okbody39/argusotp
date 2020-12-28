@@ -128,14 +128,14 @@ const LockSet = (props) => {
     <Container style={styles.container}>
       <Content padder>
         <Body style={{ alignItems: "center", paddingTop: 20 }}>
-            <Image
-              source={require("../../../../assets/logo-seedauth.png")}
-              style={{
-                width: 600 / 2.5,
-                height: 172 / 2.5,
-                marginBottom: 20
-              }}
-            />
+            {/*<Image*/}
+            {/*  source={require("../../../../assets/logo-seedauth.png")}*/}
+            {/*  style={{*/}
+            {/*    width: 600 / 2.5,*/}
+            {/*    height: 172 / 2.5,*/}
+            {/*    marginBottom: 20*/}
+            {/*  }}*/}
+            {/*/>*/}
 
           <View padder>
             <Text style={{

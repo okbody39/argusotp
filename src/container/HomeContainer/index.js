@@ -22,15 +22,9 @@ import Home from "../../stories/screens/Home";
 // import Sparkline from "react-native-sparkline";
 // import {NavigationActions} from "react-navigation";
 
-export interface Props {
-  navigation: any,
-  mainStore: any,
-};
-export interface State {};
-
 @inject("mainStore")
 @observer
-export default class HomeContainer extends React.Component<Props, State> {
+export default class HomeContainer extends React.Component {
 
   constructor(props) {
     super(props);

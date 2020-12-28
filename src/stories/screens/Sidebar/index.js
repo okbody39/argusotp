@@ -27,10 +27,6 @@ const routes = [
 	},
 ];
 
-export interface Props {
-	navigation: any,
-}
-export interface State {}
 const resetAction = StackActions.reset(
 	{
 	index: 0,
@@ -43,7 +39,7 @@ const resetAction = StackActions.reset(
 // 	key: null,
 // 	actions: [NavigationActions.navigate({ routeName: "Logout", params: { isLogout: true }})],
 // });
-export default class Sidebar extends React.Component<Props, State> {
+export default class Sidebar extends React.Component {
 
 	onPress(route) {
 

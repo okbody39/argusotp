@@ -10,15 +10,9 @@ import Constants from 'expo-constants';
 
 import ServerInfo from "../../stories/screens/ServerInfo";
 
-export interface Props {
-  navigation: any,
-  settingForm: any,
-}
-export interface State {}
-
 @inject("mainStore")
 @observer
-export default class ServerInfoContainer extends React.Component<Props, State> {
+export default class ServerInfoContainer extends React.Component {
   serverIpInput: any;
   serverPortInput: any;
 

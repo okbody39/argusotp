@@ -71,7 +71,7 @@ const AuthSwitch = createStackNavigator(
 		AuthLoading:  { screen: AuthLoading },
 		App: { screen: AppStack },
 		Auth: { screen: AuthStack },
-		Logout: { screen: Login },
+		// Logout: { screen: Login },
 	},
 	{
 		initialRouteName: "AuthLoading",

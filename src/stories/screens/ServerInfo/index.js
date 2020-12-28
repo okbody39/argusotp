@@ -5,11 +5,8 @@ import axios from 'axios';
 import OTP from 'otp-client';
 import {AsyncStorage, Image} from "react-native";
 // import styles from "./styles";
-export interface Props {
-	navigation: any;
-}
-export interface State {}
-class ServerInfo extends React.Component<Props, State> {
+
+class ServerInfo extends React.Component {
   constructor(props) {
     super(props);
     // this.state = {
