@@ -64,7 +64,7 @@ class MainStore {
       this.userToken = JSON.parse(userToken);
       this.isLogin = true;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   }
 
@@ -84,7 +84,7 @@ class MainStore {
       // this.isServerSet = true;
 
       // console.log('origin: ', _serverToken);
-      // console.log('before: ', this.serverToken);
+      // alert('before: ' + JSON.stringify(_serverToken));
 
       let serverToken = _.merge(this.serverToken, _serverToken);
 
@@ -92,10 +92,10 @@ class MainStore {
       this.serverToken = serverToken;
       this.isServerSet = true;
 
-      // console.log('after: ', this.serverToken);
+      // alert('after: '+ this.isServerSet + "---" + JSON.stringify(this.serverToken));
 
     } catch (e) {
-      console.log(e);
+      // alert(JSON.stringify(e));
     }
   }
 

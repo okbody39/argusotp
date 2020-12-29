@@ -88,7 +88,7 @@ export default class LoginContainer extends React.Component {
 
     login() {
         const { loginForm, navigation, mainStore } = this.props;
-        const { userId, password, serverIp, serverPort } = this.state;
+        const { userId, password, serverIp, serverPort } = loginForm;
         const { version } = Constants.manifest;
 
         if (!mainStore.isServerSet) {
@@ -152,6 +152,9 @@ export default class LoginContainer extends React.Component {
 
                 mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
                     // setTimeout(() => {
+
+                    // alert(">>> 1 <<<" + JSON.stringify(mainStore));
+
                     navigation.navigate("Home");
                     // }, 500);
                 });

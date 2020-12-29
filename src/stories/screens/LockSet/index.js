@@ -21,7 +21,7 @@ import {
 
 import PINSetting from "../../../component/PINSetting";
 
-import ReactNativePinView from "react-native-pin-view";
+// import ReactNativePinView from "react-native-pin-view";
 
 const platform = Platform.OS;
 import styles from "./styles";

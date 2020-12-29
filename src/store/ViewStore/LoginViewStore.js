@@ -19,10 +19,7 @@ class LoginStore {
         password: "",
         pushToken: "",
         deviceId: "",
-        serverIp: "",
-        serverPort: "",
     };
-
 
     @action
     userIdOnChange(id) {
@@ -112,11 +109,9 @@ class LoginStore {
     }
 
     @action
-    setUserInfo(userId, password, serverIp, serverPort) {
+    setUserInfo(userId, password) {
         this.userToken.userId = userId || this.userId;
         this.userToken.password = password || this.password;
-        this.userToken.serverIp = serverIp || this.serverIp;
-        this.userToken.serverPort = serverPort || this.serverPort;
     }
 
     @action

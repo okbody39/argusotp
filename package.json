@@ -1,6 +1,6 @@
 {
   "name": "ArgusOTP",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "private": true,
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.12.12",
@@ -33,15 +33,10 @@
     "react": "^17.0.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.0.tar.gz",
     "react-native-card-flip": "^1.0.7",
-    "react-native-chart-kit": "^6.4.1",
-    "react-native-gesture-handler": "^1.6.0",
-    "react-native-pin-view": "^3.0.1",
+    "react-native-gesture-handler": "~1.7.0",
     "react-native-progress-bar": "mattslight/react-native-progress-bar",
-    "react-native-reanimated": "~1.13.0",
-    "react-native-safe-area-context": "3.1.4",
-    "react-native-screens": "^2.2.0",
+    "react-native-screens": "~2.10.1",
     "react-navigation": "^4.4.0",
-    "react-navigation-drawer": "^2.5.0",
     "react-navigation-stack": "^2.8.2"
   }
 }
