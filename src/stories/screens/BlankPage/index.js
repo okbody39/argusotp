@@ -6,11 +6,8 @@ import styles from "./styles";
 // import {Image} from "../Login";
 // import pkg from "package";
 
-export interface Props {
-	navigation: any;
-}
-export interface State {}
-class BlankPage extends React.Component<Props, State> {
+
+class BlankPage extends React.Component {
 	render() {
 		const {ver} = this.props;
 		return (

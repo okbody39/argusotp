@@ -125,7 +125,9 @@ class Login extends React.Component {
 					<View padder style={{ backgroundColor: "#60B0F4", borderTopLeftRadius: 30, borderTopRightRadius: 30, height: this.state.settingMode ? 480 : 65 }}>
 						{/*<View style={{width: 80, height: 8, borderRadius: 5, backgroundColor: "lightgray"}}></View>*/}
 						<Button transparent block info onPress={() => this.setState({settingMode : !this.state.settingMode})}>
-							<Text style={{ color: "white", fontWeight: "bold" }}>Setting</Text>
+							<Text style={{ color: "white", fontWeight: "bold" }}>
+								{ this.state.settingMode ? "Close" : "Setting" }
+							</Text>
 						</Button>
 						{
 							this.state.settingMode ?

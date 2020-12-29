@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Animated } from 'react-native';
 import {
     Text, Button, Row, Icon, Left, Body, Right, Grid, View,
 } from "native-base";
@@ -14,6 +15,7 @@ function shuffle(a) {
 }
 
 let initArr = [1,2,3,4,5,6,7,8,9,0];
+
 shuffle(initArr);
 
 export default class PINSetting extends React.Component {
@@ -21,13 +23,33 @@ export default class PINSetting extends React.Component {
     constructor(props) {
         super(props);
 
+        this.shakeAnimation = new Animated.Value(0);
+
         this.state = {
+            nums: [1,2,3,4,5,6,7,8,9,0],
             inputCode: "",
         }
     }
 
+    shuffle = () => {
+        let nums = this.state.nums;
+        shuffle(nums);
+        this.setState({
+            nums
+        });
+    }
+
+    startShake = () => {
+        Animated.sequence([
+            Animated.timing(this.shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+            Animated.timing(this.shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
+            Animated.timing(this.shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+            Animated.timing(this.shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
+        ]).start();
+    }
+
     inputCode(code) {
-        const { password, onSuccess } = this.props;
+        const { password, onSuccess, onValueChange } = this.props;
 
         let inputCode = this.state.inputCode;
         let len = inputCode.length;
@@ -41,22 +63,34 @@ export default class PINSetting extends React.Component {
             inputCode: code === "C" ? "" : currentCode,
         });
 
+        if(onValueChange) {
+            onValueChange(currentCode);
+        }
+
+        if(password) {
+            //
+        } else {
+            return;
+        }
+
         if(currentCode.length === password.length) {
             if(currentCode === password) {
-                onSuccess("OK");
+                if(onSuccess) {
+                    onSuccess("OK");
+                }
             } else {
-                onSuccess("NOK");
+                if(onSuccess) {
+                    onSuccess("NOK");
+                }
+                this.startShake();
+                this.shuffle();
             }
 
             this.setState({
                 inputCode: "",
             });
 
-        } else {
-
         }
-
-
     }
 
     clearCode() {
@@ -65,15 +99,22 @@ export default class PINSetting extends React.Component {
         });
     }
 
+    componentDidMount() {
+        this.shuffle();
+    }
+
 
     render() {
-        const { color, password } = this.props;
-        let line1 = [initArr[0],initArr[1],initArr[2],initArr[3]];
-        let line2 = [initArr[4],initArr[5],initArr[6],initArr[7],];
-        let line3 = ["C",initArr[8],initArr[9],"B"];
+        const { color, password, digits, isSettingMode } = this.props;
+        const { nums } = this.state;
+
+        let line1 = [nums[0],nums[1],nums[2],nums[3]];
+        let line2 = [nums[4],nums[5],nums[6],nums[7],];
+        let line3 = ["C",nums[8],nums[9],"B"];
+
         const fields: JSX.Element[] = [];
 
-        for(let p=0 ; p<password.length ; p++) {
+        for(let p=0 ; p < digits ; p++) {
             let name = "radio-button-off";
 
             if(p < this.state.inputCode.length) {
@@ -85,6 +126,7 @@ export default class PINSetting extends React.Component {
 
         return (
             <View style={{ height: 45*3+10  }}>
+                <Animated.View style={{ transform: [{translateX: this.shakeAnimation}] }}>
                 <Row style={{ justifyContent: "center", height: 20, marginTop: 0}}>
                     {fields}
                     {/*<Text style={{ color: color }}>{this.state.inputCode}</Text>*/}
@@ -136,6 +178,7 @@ export default class PINSetting extends React.Component {
                     }
 
                 </Row>
+                </Animated.View>
             </View>
         );
     }

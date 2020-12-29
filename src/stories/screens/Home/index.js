@@ -7,7 +7,7 @@ import {
     Card, CardItem, Toast,
     H1, H2, H3, View, Form, Item, Input
 } from "native-base";
-
+import {NavigationEvents} from 'react-navigation';
 import styles from "./styles";
 // import Sparkline from "react-native-sparkline";
 import ProgressBar from "react-native-progress-bar";
@@ -16,7 +16,7 @@ import CardFlip from 'react-native-card-flip';
 import OTP from "otp-client";
 import md5 from "md5";
 
-import {AsyncStorage, Dimensions, Alert, AppState, TouchableOpacity} from "react-native";
+import {AsyncStorage, Dimensions, Alert, AppState, TouchableOpacity, Image} from "react-native";
 
 // const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -35,10 +35,6 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
 
-        let period = parseInt(this.props.mainStore.serverToken.period) - 1;
-
-        this.rdm = Math.floor(Math.random()*(period-1+1)) + 1;
-
         this.state = {
             title: "ArgusOTP",
             token: "000000",
@@ -53,61 +49,18 @@ class Home extends React.Component {
             appState: AppState.currentState,
             isFlipped: false,
             settingMode: false,
+            pinMode: false,
+            pinCode: "",
+            pinDigits: 4,
         };
 
     }
 
     componentWillUnmount() {
-        AppState.removeEventListener('change', this._handleAppStateChange);
     }
 
-    _handleAppStateChange = nextAppState => {
-        if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-            // console.log('App has come to the foreground!');
-            // Toast.show({
-            //     text: "App has come to the foreground!",
-            //     // buttonText: "OK",
-            //     // type: "success",
-            //     duration: 2000,
-            // });
-
-            AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
-
-                if(this.props.mainStore.serverToken.pincodeDigits != lockPass.length) {
-                    this.props.navigation.navigate("LockSet");
-                    return;
-                }
-
-                if(lockPass) {
-                    this.props.navigation.navigate("Lock", {
-                        mainStore: this.props.mainStore,
-                        // serverUrl: this.props.mainStore.getServerUrl(),
-                        // userid: this.props.mainStore.userToken.userId,
-                    });
-                }
-
-                // else {
-                //     if(this.props.mainStore.serverToken.pincode === "true") {
-                //         this.props.navigation.navigate("LockSet");
-                //     }
-                // }
-
-
-
-            });
-
-
-        }
-        this.setState({
-            // token: "000000",
-            appState: nextAppState
-        });
-    };
-
-
     componentDidMount() {
-        const { mainStore } = this.props;
-
+        const { mainStore, settingStore } = this.props;
 
         axios.get(mainStore.getServerUrl() + "/otp/checkConfig/" + mainStore.userToken.userId, {
             crossdomain: true,
@@ -115,14 +68,6 @@ class Home extends React.Component {
             const result = res.data;
             let jsonText = decrypt(result, mainStore.serverToken.encKey);
             let jsonObj = JSON.parse(jsonText);
-
-            // alert(JSON.stringify(mainStore.serverToken));
-            //
-            // alert(jsonText+"    ------    "+ JSON.stringify(mainStore.serverToken)+"    ------    "+ JSON.stringify(mainStore.userToken));
-
-            // alert(JSON.stringify(jsonObj.pincode) +" /// "+ JSON.stringify(mainStore.serverToken.pincode));
-
-            // alert(jsonObj.pincode);
 
             let remotePincode = jsonObj.pincodeUse || "false";
             let myPincode = mainStore.serverToken.pincodeUse || "false";
@@ -159,8 +104,8 @@ class Home extends React.Component {
 
             if (jsonObj.deviceid === "__POLICYCHANGE__") {
                 Alert.alert(
-                  'Policy Update',
-                  'Restart app to finish accepting changed policy.',
+                  '정책 업데이트',
+                  '변경된 정책을 적용하기 위해 앱을 재기동합니다.',
                   [
                       {
                           text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
@@ -172,6 +117,23 @@ class Home extends React.Component {
                 );
                 return;
 
+            } else if (jsonObj.deviceid === "__PINRESET__") {
+                Alert.alert(
+                    'PIN 삭제',
+                    'PIN 정보를 삭제하기위해 앱을 재기동합니다.',
+                    [
+                        {
+                            text: 'Restart', onPress: () => {
+                                AsyncStorage.removeItem("@SeedAuthStore:lockToken").then(() => {
+                                    Updates.reload();
+                                });
+                            }
+                        },
+                    ],
+                    {cancelable: false}
+                );
+                return;
+
             } else if (jsonObj.deviceid === "__MISSING__") {
                 clearInterval(this.state.intervalId);
                 this.setState({
@@ -179,8 +141,8 @@ class Home extends React.Component {
                 });
 
                 Alert.alert(
-                  'Warning',
-                  'Your device is not allowed to access!',
+                  '경고',
+                  '본 기기는 분실 신고된 단말기입니다! 불법적으로 사용시 형사처벌 대상이 됩니다.',
                   [
                       {
                           text: 'Exit', onPress: () => mainStore.resetUserStore().then(() => {
@@ -208,15 +170,21 @@ class Home extends React.Component {
         //     console.log(reason.message);
         });
 
-        AppState.addEventListener('change', this._handleAppStateChange);
+        // AppState.addEventListener('change', this._handleAppStateChange);
 
         AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+
             if(lockPass) {
-                this.props.navigation.navigate("Lock", {
-                    mainStore: this.props.mainStore,
-                    // serverUrl: this.props.mainStore.getServerUrl(),
-                    // userid: this.props.mainStore.userToken.userId,
+                this.setState({
+                    pinMode: true,
+                    pinCode: lockPass,
+                    pinDigits: mainStore.serverToken.pincodeDigits,
                 });
+                // this.props.navigation.navigate("Lock", {
+                //     mainStore: this.props.mainStore,
+                //     // serverUrl: this.props.mainStore.getServerUrl(),
+                //     // userid: this.props.mainStore.userToken.userId,
+                // });
             } else {
                 if(this.props.mainStore.serverToken.pincodeUse === "true") {
                     this.props.navigation.navigate("LockSet");
@@ -291,8 +259,9 @@ class Home extends React.Component {
             // alert(result.epoch + " - " + myTime + " = " + diff);
 
             Toast.show({
-                text: "Time sync .. ok (diff: " + diff + " ms)",
+                text: "시간 동기화 성공 ... (" + diff + " ms)",
                 // buttonText: "OK",
+                position: "top",
                 type: "success",
                 duration: 2500,
             });
@@ -306,78 +275,90 @@ class Home extends React.Component {
 
     render() {
         return (
-            <Container style={styles.container}  style={{ backgroundColor: "#2D2B2C" }}>
 
+            <Container style={styles.container}  style={{ backgroundColor: "#2D2B2C" }}>
+                <NavigationEvents onDidFocus={() => {
+                    AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+                        if(lockPass) {
+                            // alert(lockPass);
+                            this.setState({
+                                pinMode: true,
+                                pinCode: lockPass,
+                            });
+                        } else {
+                            this.setState({
+                                pinMode: false,
+                                pinCode: lockPass,
+                            });
+                        }
+                    });
+                }} />
                 <Content padder>
 
-                    <Body style={{ marginTop: 20, marginBottom: 25 }}>
+                    {/*<Body>*/}
+                    <Row style={{ marginTop: 20, marginBottom: 25, marginHorizontal: 10 }}>
                         <Title style={{ color: "#60B0F4", fontWeight: "bold", fontSize: 22 }}>{ this.state.title }</Title>
-                    </Body>
+                        <Right style={{ marginTop: 8 }}>
+                            <Text style={{color: "gray"}}>v{Constants.manifest.version}</Text>
+                        </Right>
+                    </Row>
+                    {/*</Body>*/}
 
                     <View style={{ padding: 4 }}>
                         <CardFlip ref={(card) => this.card = card}  style={{
                             // width: 320,
                             height: 250,
                         }}>
-                            <View style={{ backgroundColor: "white", borderRadius: 10, paddingTop: 30, height: 250 }} >
-                                <View style={{ alignItems: "center" }} >
-                                    <H3 style={{ color: "grey", marginTop: 5, marginBottom: 8 }}>
-                                        CHECK YOUR PIN
-                                    </H3>
-                                    <PINSetting color="#2D2B2C" password="1234" onSuccess={(res) => {
-                                        if(res === "OK") {
-                                            this.card.flip();
-                                            setTimeout(() => this.card.flip(), 30000);
-                                        }
-                                    }}/>
-                                </View>
-                            </View>
+                            {
+                                this.state. pinMode ?
+                                    <View style={{ backgroundColor: "white", borderRadius: 10, paddingTop: 30, height: 250 }} >
+                                        <View style={{ alignItems: "center" }} >
+                                            <H3 style={{ color: "grey", marginTop: 5, marginBottom: 8 }}>
+                                                ENTER YOUR PIN
+                                            </H3>
+                                            <PINSetting color="#2D2B2C" password={ this.state.pinCode } digits={ this.state.pinDigits } onSuccess={(res) => {
+                                                if(res === "OK") {
+                                                    this.card.flip();
+                                                    setTimeout(() => this.card.flip(), 30000);
+                                                }
+                                            }}/>
+                                        </View>
+                                    </View>
+                                :
 
-                            {/*<TouchableOpacity style={{*/}
-                            {/*    // width: 320,*/}
-                            {/*    height: 200,*/}
-                            {/*    // backgroundColor: 'white',*/}
-                            {/*    // borderRadius: 5,*/}
-                            {/*    // shadowColor: 'rgba(0,0,0,0.5)',*/}
-                            {/*    // shadowOffset: {*/}
-                            {/*    //     width: 0,*/}
-                            {/*    //     height: 1,*/}
-                            {/*    // },*/}
-                            {/*    // shadowOpacity: 0.5,*/}
-                            {/*}} onPress={() => {*/}
-                            {/*    this.card.flip();*/}
-                            {/*    setTimeout(() => {*/}
-                            {/*        this.card.flip();*/}
-                            {/*    }, 10000);*/}
-                            {/*}} >*/}
-                            {/*    <Card style={{ justifyContent: "center", height: 200, borderRadius: 10 }} >*/}
-                            {/*        <CardItem>*/}
-                            {/*            <Body style={{ alignItems: "center" }} >*/}
-                            {/*                <H3 style={{ color: "grey", marginBottom: 8 }}>*/}
-                            {/*                    CHECK PASSWORD*/}
-                            {/*                </H3>*/}
-                            {/*                <H2 style={{ color: "grey", marginBottom: 0, fontWeight: "bold" }}>*/}
-                            {/*                    CLICK!*/}
-                            {/*                </H2>*/}
-                            {/*                <Icon type="FontAwesome5" active name="hand-point-up" style={{ color: "lightgray", fontSize: 60 }} />*/}
-                            {/*            </Body>*/}
-                            {/*        </CardItem>*/}
-                            {/*    </Card>*/}
-                            {/*</TouchableOpacity>*/}
-                            {/*<TouchableOpacity style={{*/}
-                            {/*    height: 200,*/}
-                            {/*    // backgroundColor: 'white',*/}
-                            {/*    // borderRadius: 5,*/}
-                            {/*    // shadowColor: 'rgba(0,0,0,0.5)',*/}
-                            {/*    // shadowOffset: {*/}
-                            {/*    //     width: 0,*/}
-                            {/*    //     height: 1,*/}
-                            {/*    // },*/}
-                            {/*    // shadowOpacity: 0.5,*/}
-                            {/*}} onPress={() => this.card.flip()} >*/}
+                                    <TouchableOpacity style={{
+                                        height: 250,
+                                    }} onPress={() => {
+                                        if(this.card) this.card.flip();
+                                        this.setState({
+                                           settingMode: false,
+                                        });
+                                        setTimeout(() => {
+                                            if(this.card) this.card.flip();
+                                        }, 30000);
+                                    }} >
+                                        <Card style={{ justifyContent: "center", height: 200, borderRadius: 10 }} >
+                                            <CardItem>
+                                                <Body style={{ alignItems: "center" }} >
+                                                    <H3 style={{ color: "grey", marginBottom: 8 }}>
+                                                        CHECK PASSWORD
+                                                    </H3>
+                                                    <H2 style={{ color: "grey", marginBottom: 0, fontWeight: "bold" }}>
+                                                        CLICK!
+                                                    </H2>
+                                                    <Icon type="FontAwesome5" active name="hand-point-up" style={{ color: "lightgray", fontSize: 60 }} />
+                                                </Body>
+                                            </CardItem>
+                                        </Card>
+                                    </TouchableOpacity>
+                                }
+
                                 <Card style={{ alignItems: "center", justifyContent: "center", height: 250, borderRadius: 10 }}>
+                                    {/*<Text style={{ color: "grey", fontSize: 17 }}>*/}
+                                    {/*    {this.props.mainStore.userToken.userId}'s*/}
+                                    {/*</Text>*/}
                                     <H3 style={{color: "grey"}}>
-                                        VERIFY PASSWORD
+                                        ONE-TIME PASSWORD
                                     </H3>
                                     {/*<H3 style={{color: "grey"}}>*/}
                                     {/*    PASSWORD*/}
@@ -431,19 +412,26 @@ class Home extends React.Component {
                                     {/*</CardItem>*/}
                                     <CardItem>
                                         <Row>
-                                            <Left/>
+                                            <Left>
+
+                                            </Left>
                                             <Right style={{ marginRight: 13 }}>
-                                                <Text note>{this.state.nextTokenSecond} second(s) left</Text>
+                                                <Text note>{this.state.nextTokenSecond} 초 남음</Text>
                                             </Right>
                                         </Row>
                                     </CardItem>
                                 </Card>
                             {/*</TouchableOpacity>*/}
                         </CardFlip>
-                        <Right style={{ marginTop: 8 }}>
-                            <Text style={{color: "gray"}}>v{Constants.manifest.version}</Text>
-                        </Right>
+
                     </View>
+
+                    <Body style={{ alignItems: "center", paddingTop: 40 }}>
+                        <Image
+                        source={require("../../../../assets/argusotp-logo-allwhite.png")}
+                        style={{ height: 50,  resizeMode: 'contain', opacity: 0.1 }}
+                    />
+                    </Body>
 
                 </Content>
 
@@ -453,7 +441,9 @@ class Home extends React.Component {
                         height: this.state.settingMode ? 300 : 65 }} >
                         {/*<View style={{width: 80, height: 8, borderRadius: 5, backgroundColor: "lightgray"}}></View>*/}
                         <Button transparent block info onPress={() => this.setState({settingMode : !this.state.settingMode})}>
-                            <Text style={{ color: "white", fontWeight: "bold" }}>MENU</Text>
+                            <Text style={{ color: "white", fontWeight: "bold" }}>
+                                { this.state.settingMode ? "닫기" : "MENU" }
+                            </Text>
                         </Button>
                         {
                             this.state.settingMode ?
@@ -461,18 +451,28 @@ class Home extends React.Component {
                                 <View padder>
                                     <Button rounded block
                                             style={{ backgroundColor: "#2D2B2C", marginBottom: 8 }}
-                                            onPress={() => this.props.navigation.navigate("LockSet")} >
+                                            onPress={() => {
+                                                this.setState({
+                                                    settingMode: false,
+                                                });
+                                                this.props.navigation.navigate("LockSet");
+                                            }} >
                                         {/*<Icon name='information-circle' />*/}
-                                        <Text>PIN Setting</Text>
+                                        <Text>PIN 설정</Text>
                                     </Button>
                                 {/*</View>*/}
                                 {/*<View padder style={{ marginTop: -10 }}>*/}
                                     <Button rounded block
                                             style={{ backgroundColor: "#2D2B2C", marginBottom: 8 }}
-                                            onPress={() => this.timeSync()} >
+                                            onPress={() => {
+                                                this.setState({
+                                                    settingMode: false,
+                                                });
+                                                this.timeSync();
+                                            }} >
                                         {/*<Icon name='time' />*/}
                                         {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
-                                        <Text>Time Synchronization</Text>
+                                        <Text>시간 동기화</Text>
                                     </Button>
                                     <Button rounded block
                                             danger
