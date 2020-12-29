@@ -1,14 +1,17 @@
 import * as React from "react";
 import Constants from 'expo-constants';
-import { Item, Input, Icon, Form, Toast, View } from "native-base";
+import {Item, Input, Icon, Form, Toast, View, Button, Text} from "native-base";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
-import { AsyncStorage } from "react-native";
+import {AsyncStorage, Platform} from "react-native";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 
 import { encrypt, decrypt} from "../../utils/crypt";
 import Login from "../../stories/screens/Login";
+
+const platform = Platform.OS;
+const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 
 @inject("loginForm", "mainStore")
 @observer
@@ -17,11 +20,18 @@ export default class LoginContainer extends React.Component {
     constructor(props) {
         super(props);
 
-        const { loginForm } = this.props;
+        const { loginForm, mainStore, navigation } = this.props;
+
+        // if (mainStore.isLogin) {
+        //     navigation.navigate("Home");
+        // }
 
         this.state = {
             userId: loginForm.userId || "",
             password: loginForm.password || "",
+            serverIp: loginForm.serverIp || "",
+            serverPort: loginForm.serverPort || "",
+            settingMode: false,
         }
 
         this._bootstrapAsync();
@@ -43,14 +53,12 @@ export default class LoginContainer extends React.Component {
             return;
         }
 
-        let token = await Notifications.getExpoPushTokenAsync();
-
-
+        const token = await Notifications.getExpoPushTokenAsync();
         loginForm.setPushInfo(token);
 
         const deviceId = Constants.deviceId;
-
         loginForm.setDeviceId(deviceId);
+
     };
 
     componentWillMount() {
@@ -64,31 +72,29 @@ export default class LoginContainer extends React.Component {
             return;
         }
 
-        if (!mainStore.isServerSet) {
-            Toast.show({
-                text: "Please setting your server first",
-                duration: 2000,
-                position: "top",
-                type: "danger",
-                textStyle: { textAlign: "center" },
-            });
 
-            return;
-        }
-
-        if (mainStore.isLogin) {
-            navigation.navigate("Drawer");
-        }
     }
+
+    componentDidMount() {
+        // const { loginForm, navigation, mainStore } = this.props;
+        //
+        // if (!mainStore.isServerSet) {
+        //
+        //
+        //
+        // }
+    }
+
 
     login() {
         const { loginForm, navigation, mainStore } = this.props;
-        const { userId, password } = this.state;
+        const { userId, password, serverIp, serverPort } = this.state;
         const { version } = Constants.manifest;
 
         if (!mainStore.isServerSet) {
+
             Toast.show({
-                text: "Please setting your server first",
+                text: "먼저 서버 셋팅을 진헹해 주세요.",
                 duration: 2000,
                 position: "top",
                 type: "warning",
@@ -99,7 +105,7 @@ export default class LoginContainer extends React.Component {
         }
         // alert("1-1");
 
-        loginForm.validateForm();
+        loginForm.validateLoginForm();
 
         const formPayload = {
             userid: userId,
@@ -133,19 +139,25 @@ export default class LoginContainer extends React.Component {
                 loginForm.userToken.userId = userId;
                 loginForm.userToken.password = password;
 
+                mainStore.serverToken.otpServerIp = serverIp;
+                mainStore.serverToken.otpServerPort = serverPort;
+                mainStore.serverToken.encKey = jsonObj.encKey;
+
                 mainStore.serverToken.otpKey = jsonObj.reason;
                 mainStore.serverToken.period = jsonObj.period;
                 mainStore.serverToken.digits = jsonObj.digits;
+
                 mainStore.serverToken.pincodeUse = jsonObj.pincodeUse || "false";
                 mainStore.serverToken.pincodeDigits = jsonObj.pincodeDigits || "4";
 
                 mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
                     // setTimeout(() => {
-                    navigation.navigate("AuthLoading");
+                    navigation.navigate("Home");
                     // }, 500);
                 });
 
             } else {
+
                 loginForm.clearStore();
                 mainStore.resetUserStore();
 
@@ -163,12 +175,66 @@ export default class LoginContainer extends React.Component {
 
     }
 
+    onSave() {
+        const { loginForm, mainStore } = this.props;
+        const { serverIp, serverPort } = loginForm;
+
+        if (serverIp && serverPort) {
+            axios.get("http://" + serverIp + ":" + serverPort + "/otp/encryptKey", {
+                crossdomain: true,
+            }).then(res => {
+                const result = res.data;
+                let jsonText = decrypt(result, _DEFAULT_KEY_);
+
+                let jsonObj = JSON.parse(jsonText);
+
+                mainStore.serverToken.otpServerIp = serverIp;
+                mainStore.serverToken.otpServerPort = serverPort;
+                mainStore.serverToken.encKey = jsonObj.encKey;
+
+                let saveServerInfo = {
+                    otpServerIp: serverIp,
+                    otpServerPort: serverPort,
+                    encKey: jsonObj.encKey,
+                };
+
+                mainStore.saveServerStore(saveServerInfo).then(() => {
+                    try {
+                        mainStore.resetUserStore();
+                        // navigation.dispatch(resetAction);
+                        // alert(JSON.stringify(settingForm.serverToken));
+                    } catch(e) {
+                        // alert(JSON.stringify(e));
+                    }
+                });
+
+            }).catch(err => {
+                Toast.show({
+                    text: "OTP Server error!",
+                    duration: 2000,
+                    position: "top",
+                    type: "danger",
+                    textStyle: { textAlign: "center" },
+                });
+            });
+        } else {
+            Toast.show({
+                text: "Server IP or Port invalid!",
+                duration: 2000,
+                position: "top",
+                type: "danger",
+                textStyle: { textAlign: "center" },
+            });
+        }
+    }
+
     render() {
-        const form = this.props.loginForm;
+        const { loginForm, mainStore } = this.props;
+
         const Fields = (
             <Form>
                 <View style={{ marginHorizontal: 8, marginBottom: 8 }}>
-                    <Item rounded error={!!form.userIdError} style={{ paddingLeft: 8, paddingTop: 0 }}>
+                    <Item rounded error={!!loginForm.userIdError} style={{ paddingLeft: 8, paddingTop: 0 }}>
                         <Icon active name="person" style={{ color: "lightgray" }} />
                         <Input
                             style={{ marginTop: -5, color: "lightgray" }}
@@ -176,29 +242,69 @@ export default class LoginContainer extends React.Component {
                             placeholderTextColor="#c9c9c9"
                             keyboardType="email-address"
                             autoCapitalize = "none"
-                            value={this.state.userId}
+                            value={ loginForm.userId }
                             // onBlur={() => form.validateUserId()}
-                            onChangeText={e => this.setState({ userId: e })}
+                            // onChangeText={e => this.setState({ userId: e })}
+                            onChangeText={e => loginForm.userIdOnChange(e) }
                         />
                     </Item>
                 </View>
                 <View style={{ marginHorizontal: 8, marginBottom: 8 }}>
-                    <Item rounded error={!!form.passwordError} style={{ paddingLeft: 8, paddingTop: 0 }}>
+                    <Item rounded error={!!loginForm.passwordError} style={{ paddingLeft: 8, paddingTop: 0 }}>
                         <Icon active name="unlock" style={{ color: "lightgray" }} />
                         <Input
                             style={{ marginTop: -5, marginLeft: 3, color: "lightgray" }}
                             placeholder="Password"
                             placeholderTextColor="#c9c9c9"
                             autoCapitalize = "none"
-                            value={this.state.password}
+                            value={loginForm.password}
                             // onBlur={() => form.validatePassword()}
-                            onChangeText={e => this.setState({ password: e })}
+                            // onChangeText={e => this.setState({ password: e })}
+                            onChangeText={e => loginForm.passwordOnChange(e) }
                             secureTextEntry={true}
                         />
                     </Item>
                 </View>
             </Form>
         );
-        return <Login navigation={this.props.navigation} loginForm={Fields} onLogin={() => this.login()} />;
+
+        let settingForm = (
+            <Form>
+                <View style={{ marginHorizontal: 8, marginTop: 16, marginBottom: 8 }}>
+                    <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
+                        <Icon type={"FontAwesome"} active name="server" style={{ color: "lightgray" }} />
+                        <Input
+                            style={{ marginTop: -5}}
+                            placeholder="Server IP"
+                            placeholderTextColor="#c9c9c9"
+                            // keyboardType="numeric"
+                            value={ loginForm.serverIp }
+                            // onChangeText={ e => this.setState({serverIp: e}) }
+                            onChangeText={e => loginForm.serverIpOnChange(e) }
+                        />
+                    </Item>
+                </View>
+                <View style={{ marginHorizontal: 8, marginBottom: 8 }}>
+                    <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
+                        <Icon type={"FontAwesome"} active name="th-large" style={{ color: "lightgray" }} />
+                        <Input
+                            style={{ marginTop: -5}}
+                            placeholder="Server Port"
+                            placeholderTextColor="#c9c9c9"
+                            keyboardType="numeric"
+                            value={ loginForm.serverPort }
+                            // onChangeText={ e => this.setState({serverPort: e}) }
+                            onChangeText={e => loginForm.serverPortOnChange(e) }
+                        />
+                    </Item>
+                </View>
+            </Form>
+        );
+        return <Login navigation={this.props.navigation}
+                      isServerSet={ mainStore.isServerSet }
+                      loginForm={ Fields }
+                      settingForm={ settingForm }
+                      onLogin={() => this.login() }
+                      onSave={() => this.onSave() } />;
     }
 }

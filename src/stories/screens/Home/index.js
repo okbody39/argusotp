@@ -201,9 +201,10 @@ class Home extends React.Component {
 
         let intervalId = setInterval(() => {
 
-            const { mainStore } = this.props;
+            const { mainStore, navigation } = this.props;
 
             if (!mainStore.isServerSet) {
+                navigation.navigate("Login");
                 return;
             }
 
@@ -245,9 +246,9 @@ class Home extends React.Component {
     }
 
     timeSync() {
-        let checkUrl = this.props.mainStore.getServerUrl() + "/otp/epoch";
+        const { mainStore } = this.props;
 
-        // alert(checkUrl);
+        let checkUrl = mainStore.getServerUrl() + "/otp/epoch";
 
         axios.get(checkUrl, {
             crossdomain: true,
@@ -259,7 +260,7 @@ class Home extends React.Component {
             // alert(result.epoch + " - " + myTime + " = " + diff);
 
             Toast.show({
-                text: "시간 동기화 성공 ... (" + diff + " ms)",
+                text: "시간 동기화 성공 ... " + (diff > 1000 ? "(" + diff + " ms)" : ""),
                 // buttonText: "OK",
                 position: "top",
                 type: "success",
@@ -482,7 +483,7 @@ class Home extends React.Component {
                                                     {
                                                         index: 0,
                                                         key: null,
-                                                        actions: [NavigationActions.navigate({ routeName: "Auth", params: { isLogout: true }})],
+                                                        actions: [NavigationActions.navigate({ routeName: "Logout", params: { isLogout: true }})],
                                                     }
                                                 )
                                                 )} >

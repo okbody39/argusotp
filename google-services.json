@@ -1,39 +1,36 @@
 {
   "project_info": {
-    "project_number": "36368506036",
-    "firebase_url": "https://seedauth-fe6f7.firebaseio.com",
-    "project_id": "seedauth-fe6f7",
-    "storage_bucket": "seedauth-fe6f7.appspot.com"
+    "project_number": "814132463964",
+    "project_id": "argusotp-d0f97",
+    "storage_bucket": "argusotp-d0f97.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:36368506036:android:4a9aeee4a43ccc48",
+        "mobilesdk_app_id": "1:814132463964:android:cf815a36c2112d2f5dd999",
         "android_client_info": {
           "package_name": "kr.co.cielcloud.argusotp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "36368506036-rhpsij7lcev5573diistlj808nkkiq5f.apps.googleusercontent.com",
+          "client_id": "814132463964-p42v26v81rt9e1eqn1rosbibtqe5ligr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD-WYHywSUrHL-Bd1Q2GSAd1mU9drVEe5o"
+          "current_key": "AIzaSyA8qYyTqA8mkoR6NSMKF4fYZ0badewZe-g"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "814132463964-p42v26v81rt9e1eqn1rosbibtqe5ligr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
