@@ -2,6 +2,9 @@ import { observable, action } from "mobx";
 import { AsyncStorage } from 'react-native';
 
 class LoginStore {
+
+    @observable compCode = "";
+
     @observable userId = "";
     @observable password = "";
     @observable userIdError = "";
@@ -20,6 +23,11 @@ class LoginStore {
         pushToken: "",
         deviceId: "",
     };
+
+    @action
+    compCodeOnChange(code) {
+        this.compCode = code;
+    }
 
     @action
     userIdOnChange(id) {

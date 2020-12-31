@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, Platform } from "react-native";
+import { Image, Platform, KeyboardAvoidingView } from "react-native";
 import {
 	Container,
 	Content,
@@ -48,18 +48,21 @@ class Login extends React.Component {
 
 					<View style={{ margin: 16, marginBottom: 8 }}>
 						<Button rounded block onPress={() => onLogin()} style={{ backgroundColor: "white" }}>
-							<Text style={{ color: "#2D2B2C", fontWeight: "bold" }}>Login</Text>
+							<Text style={{ color: "#2D2B2C", fontWeight: "bold" }}>로그인</Text>
 						</Button>
 					</View>
 
 
 				</Content>
 
-				<View padder style={{ backgroundColor: "#2D2B2C" }}>
+				<KeyboardAvoidingView
+					// behavior={null}
+					// keyboardVerticalOffset={60}
+					style={{ backgroundColor: "#2D2B2C" }}>
 					<View padder style={{ backgroundColor: "#60B0F4", borderTopLeftRadius: 30, borderTopRightRadius: 30, height: settingMode ? 480 : 65 }}>
 						<Button transparent block info onPress={() => this.setState({ settingMode : !settingMode })}>
 							<Text style={{ color: "white", fontWeight: "bold" }}>
-								{ settingMode ? "Close" : "Setting" }
+								{ settingMode ? "닫기" : "설정" }
 							</Text>
 						</Button>
 						{
@@ -68,7 +71,7 @@ class Login extends React.Component {
 									{ settingForm }
 									<View style={{  marginHorizontal: 8, marginTop: 8 }}>
 										<Button rounded block onPress={() => { this.setState({ settingMode: false }); onSave();}} style={{ backgroundColor: "#2D2B2C" }}>
-											<Text style={{ color: "white", fontWeight: "bold" }}>Save</Text>
+											<Text style={{ color: "white", fontWeight: "bold" }}>저장</Text>
 										</Button>
 									</View>
 								</>
@@ -76,7 +79,7 @@ class Login extends React.Component {
 						}
 
 					</View>
-				</View>
+				</KeyboardAvoidingView>
 
 			</Container>
 

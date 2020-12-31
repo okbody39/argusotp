@@ -8,6 +8,9 @@ import {
     H1, H2, H3, View, Form, Item, Input
 } from "native-base";
 import {NavigationEvents} from 'react-navigation';
+import * as LocalAuthentication from 'expo-local-authentication';
+
+
 import styles from "./styles";
 // import Sparkline from "react-native-sparkline";
 import ProgressBar from "react-native-progress-bar";
@@ -27,6 +30,7 @@ import axios from "axios";
 import {decrypt} from "../../../utils/crypt";
 import {NavigationActions, StackActions} from "react-navigation";
 import Constants from "expo-constants";
+import platform from "../../../theme/variables/platform";
 
 // var ProgressBar = require("react-native-progress-bar");
 
@@ -52,15 +56,88 @@ class Home extends React.Component {
             pinMode: false,
             pinCode: "",
             pinDigits: 4,
+
+            compatible: false,
+            fingerprints: false,
+            result: '',
         };
 
     }
+
+    checkDeviceForHardware = async () => {
+        let compatible = await LocalAuthentication.hasHardwareAsync();
+        this.setState({ compatible });
+    };
+
+    checkForFingerprints = async () => {
+        let fingerprints = await LocalAuthentication.isEnrolledAsync();
+        this.setState({ fingerprints });
+    };
+
+    scanFingerprint = async () => {
+        let result = await LocalAuthentication.authenticateAsync(
+            Platform.OS === "ios" ? "지문을 입력해주세요" : "ArgusOTP 인증"
+        );
+
+        if(result.success) {
+            if(this.card) this.card.flip();
+            this.setState({
+                settingMode: false,
+            });
+            setTimeout(() => {
+                if(this.card) this.card.flip();
+            }, 30000);
+
+        } else {
+            // alert(JSON.stringify(result));
+
+            if(result.error === "user_cancel") {
+                //
+            } else {
+                Alert.alert(
+                    "생체 인증",
+                    "생체 인증에 실패하였습니다. - " + result.error,
+                    [
+                        { text: "OK", onPress: () => console.log("OK Pressed") }
+                    ],
+                    { cancelable: false }
+                );
+            }
+
+        }
+
+    };
+
+    // showAndroidAlert = () => {
+    //     Alert.alert(
+    //         'Fingerprint Scan',
+    //         'Place your finger over the touch sensor and press scan.',
+    //         [
+    //             {
+    //                 text: 'Scan',
+    //                 onPress: () => {
+    //                     this.scanFingerprint();
+    //                 },
+    //             },
+    //             {
+    //                 text: 'Cancel',
+    //                 onPress: () => console.log('Cancel'),
+    //                 style: 'cancel',
+    //             },
+    //         ]
+    //     );
+    // };
 
     componentWillUnmount() {
     }
 
     componentDidMount() {
-        const { mainStore, settingStore } = this.props;
+        const { mainStore } = this.props;
+
+        this.checkDeviceForHardware();
+        this.checkForFingerprints();
+
+        // alert(mainStore.getServerUrl() + "/otp/checkConfig/" + mainStore.userToken.userId);
 
         axios.get(mainStore.getServerUrl() + "/otp/checkConfig/" + mainStore.userToken.userId, {
             crossdomain: true,
@@ -81,8 +158,8 @@ class Home extends React.Component {
                 remotePincodeDigits !== myPincodeDigits
             ) {
                 Alert.alert(
-                  'Policy Update',
-                  'Restart app to finish accepting changed policy.',
+                  '정책 업데이트',
+                  '정책이 변동되어 적용을 위해 앱을 재기동합니다.',
                   [
                       {
                           text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
@@ -165,9 +242,9 @@ class Home extends React.Component {
                 });
             }, 500);
 
-        // }).catch( reason => {
-        //     Alert.alert('Error', reason.message );
-        //     console.log(reason.message);
+        }).catch( reason => {
+            Alert.alert('Error', reason.message );
+            console.log(reason.message);
         });
 
         // AppState.addEventListener('change', this._handleAppStateChange);
@@ -265,6 +342,7 @@ class Home extends React.Component {
                 position: "top",
                 type: "success",
                 duration: 2500,
+                textStyle: { textAlign: "center" },
             });
 
             this.setState({
@@ -275,6 +353,8 @@ class Home extends React.Component {
     }
 
     render() {
+        const { mainStore } = this.props;
+
         return (
 
             <Container style={styles.container}  style={{ backgroundColor: "#2D2B2C" }}>
@@ -312,6 +392,26 @@ class Home extends React.Component {
                         }}>
                             {
                                 this.state. pinMode ?
+                                this.state. pinCode === "__BIOAUTH__" ?
+
+                                    <TouchableOpacity style={{
+                                        height: 250,
+                                    }} onPress={() => {
+                                        this.scanFingerprint();
+
+                                    }} >
+                                        <Card style={{ justifyContent: "center", height: 200, borderRadius: 10 }} >
+                                            <CardItem>
+                                                <Body style={{ alignItems: "center" }} >
+                                                    <Text style={{ fontSize: 20, color: "grey", marginBottom: 8 }} >생체 인증이 필요합니다.</Text>
+                                                    <Text style={{ fontSize: 20, color: "grey", marginBottom: 28 }} >아래를 클릭 해주세요.</Text>
+                                                    <Icon type="FontAwesome5" name="fingerprint" style={{ fontSize: 70, color: "lightgrey" }} />
+                                                </Body>
+                                            </CardItem>
+                                        </Card>
+                                    </TouchableOpacity>
+
+                                    :
                                     <View style={{ backgroundColor: "white", borderRadius: 10, paddingTop: 30, height: 250 }} >
                                         <View style={{ alignItems: "center" }} >
                                             <H3 style={{ color: "grey", marginTop: 5, marginBottom: 8 }}>
@@ -436,19 +536,18 @@ class Home extends React.Component {
 
                 </Content>
 
-                <View padder style={{ backgroundColor: "#2D2B2C" }}>
+                <View style={{ backgroundColor: "#2D2B2C" }}>
                     <View padder style={{
                         backgroundColor: "#60B0F4", borderTopLeftRadius: 30, borderTopRightRadius: 30,
-                        height: this.state.settingMode ? 300 : 65 }} >
+                        height: this.state.settingMode ? 400 : 65 }} >
                         {/*<View style={{width: 80, height: 8, borderRadius: 5, backgroundColor: "lightgray"}}></View>*/}
                         <Button transparent block info onPress={() => this.setState({settingMode : !this.state.settingMode})}>
                             <Text style={{ color: "white", fontWeight: "bold" }}>
-                                { this.state.settingMode ? "닫기" : "MENU" }
+                                { this.state.settingMode ? "닫기" : "메뉴" }
                             </Text>
                         </Button>
                         {
                             this.state.settingMode ?
-                                <View>
                                 <View padder>
                                     <Button rounded block
                                             style={{ backgroundColor: "#2D2B2C", marginBottom: 8 }}
@@ -459,7 +558,7 @@ class Home extends React.Component {
                                                 this.props.navigation.navigate("LockSet");
                                             }} >
                                         {/*<Icon name='information-circle' />*/}
-                                        <Text>PIN 설정</Text>
+                                        <Text>인증 설정</Text>
                                     </Button>
                                 {/*</View>*/}
                                 {/*<View padder style={{ marginTop: -10 }}>*/}
@@ -478,21 +577,27 @@ class Home extends React.Component {
                                     <Button rounded block
                                             danger
                                             // style={{ backgroundColor: "#2D2B2C" }}
-                                            onPress={() => this.props.navigation.dispatch(
-                                                StackActions.reset(
-                                                    {
-                                                        index: 0,
-                                                        key: null,
-                                                        actions: [NavigationActions.navigate({ routeName: "Logout", params: { isLogout: true }})],
-                                                    }
-                                                )
-                                                )} >
+                                            onPress={() => {
+
+                                                this.props.mainStore.resetUserStore();
+
+                                                setTimeout(() => {
+                                                    this.props.navigation.dispatch(
+                                                        StackActions.reset(
+                                                            {
+                                                                index: 0,
+                                                                key: null,
+                                                                actions: [NavigationActions.navigate({ routeName: "Logout", params: { isLogout: true }})],
+                                                            })
+                                                    );
+                                                }, 100);
+
+                                            }} >
                                         {/*<Icon name='time' />*/}
                                         {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
-                                        <Text>Logout</Text>
+                                        <Text>로그아웃</Text>
                                     </Button>
 
-                                </View>
                                 </View>
                                 : null
                         }

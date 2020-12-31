@@ -1,13 +1,19 @@
+
+const __LICENSESERVER__ = "192.168.1.2:9000";
+
+
 import * as React from "react";
 import Constants from 'expo-constants';
-import {Item, Input, Icon, Form, Toast, View, Button, Text} from "native-base";
+import { Item, Input, Icon, Form, Toast, View, Button, Text } from "native-base";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
-import {AsyncStorage, Platform} from "react-native";
+import { AsyncStorage, Platform } from "react-native";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 
-import { encrypt, decrypt} from "../../utils/crypt";
+import SmoothPinCodeInput from "react-native-smooth-pincode-input";
+
+import { encrypt, decrypt, encryptStr, decryptStr} from "../../utils/crypt";
 import Login from "../../stories/screens/Login";
 
 const platform = Platform.OS;
@@ -35,6 +41,8 @@ export default class LoginContainer extends React.Component {
         }
 
         this._bootstrapAsync();
+
+
     }
 
     _bootstrapAsync = async () => {
@@ -59,30 +67,30 @@ export default class LoginContainer extends React.Component {
         const deviceId = Constants.deviceId;
         loginForm.setDeviceId(deviceId);
 
+        mainStore.loadStore();
+
+        loginForm.compCodeOnChange(mainStore.serverToken.compCode);
+
     };
 
     componentWillMount() {
         const { loginForm, navigation, mainStore } = this.props;
         let isLogout = navigation.state.params ? navigation.state.params.isLogout : false;
 
-        loginForm.clearStore();
-
         if (isLogout) {
+            loginForm.clearStore();
             mainStore.resetUserStore();
             return;
         }
 
-
     }
 
     componentDidMount() {
-        // const { loginForm, navigation, mainStore } = this.props;
-        //
-        // if (!mainStore.isServerSet) {
-        //
-        //
-        //
-        // }
+        const { loginForm, navigation, mainStore } = this.props;
+
+        if (mainStore.isServerSet && mainStore.isLogin) {
+            navigation.navigate("Home");
+        }
     }
 
 
@@ -131,17 +139,18 @@ export default class LoginContainer extends React.Component {
             let jsonText = decrypt(result, mainStore.serverToken.encKey);
             let jsonObj = JSON.parse(jsonText);
 
-            // alert(jsonText);
-            jsonObj.result = "True";
+            // alert("OTP-REGISTER >>> "+jsonText);
+            // jsonObj.result = "True";
 
             if (jsonObj.result === "True") {
 
                 loginForm.userToken.userId = userId;
                 loginForm.userToken.password = password;
 
-                mainStore.serverToken.otpServerIp = serverIp;
-                mainStore.serverToken.otpServerPort = serverPort;
-                mainStore.serverToken.encKey = jsonObj.encKey;
+                // mainStore.serverToken.otpServerIp = serverIp;
+                // mainStore.serverToken.otpServerPort = serverPort;
+
+                // mainStore.serverToken.encKey = jsonObj.encKey;
 
                 mainStore.serverToken.otpKey = jsonObj.reason;
                 mainStore.serverToken.period = jsonObj.period;
@@ -149,6 +158,8 @@ export default class LoginContainer extends React.Component {
 
                 mainStore.serverToken.pincodeUse = jsonObj.pincodeUse || "false";
                 mainStore.serverToken.pincodeDigits = jsonObj.pincodeDigits || "4";
+
+                // alert(JSON.stringify(mainStore.serverToken));
 
                 mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
                     // setTimeout(() => {
@@ -182,53 +193,121 @@ export default class LoginContainer extends React.Component {
         const { loginForm, mainStore } = this.props;
         const { serverIp, serverPort } = loginForm;
 
-        if (serverIp && serverPort) {
-            axios.get("http://" + serverIp + ":" + serverPort + "/otp/encryptKey", {
+        // alert(JSON.stringify(mainStore));
+
+        let data = {
+            username: "",
+            sitecode: loginForm.compCode,
+            pushtoken: loginForm.userToken.pushToken,
+            deviceid: loginForm.userToken.deviceid,
+            app: "ArgusOTP",
+            appversion: Constants.manifest.version,
+            phone: "",
+            email: "",
+        };
+        let enc = encodeURIComponent(encryptStr(data));
+
+        axios.get("http://" + __LICENSESERVER__+ "/api/register?enc="+enc, {
+            // enc : enc,
+            crossdomain: true,
+        }).then(rst => {
+            let result = {
+                sitename: "",
+                desc: "{}",
+                status: "N",
+                contact: ""
+            }
+
+            try {
+                result = decryptStr(rst.data, result);
+            } catch(e) {
+                throw "COMPCODE-ERR";
+            }
+
+            result.desc = JSON.parse(result.desc);
+
+            // alert(result.desc.serverIP + ":" + result.desc.serverPort);
+
+            let serverIP = result.desc.serverIP;
+            let serverPort = result.desc.serverPort;
+
+
+
+            if(serverIP && serverPort) {
+                //
+            } else {
+                throw "COMPCODE-ERR";
+            }
+
+            axios.get("http://" + serverIP + ":" + serverPort + "/otp/encryptKey", {
                 crossdomain: true,
             }).then(res => {
                 const result = res.data;
-                let jsonText = decrypt(result, _DEFAULT_KEY_);
 
+                let jsonText = decrypt(result, _DEFAULT_KEY_);
                 let jsonObj = JSON.parse(jsonText);
 
-                mainStore.serverToken.otpServerIp = serverIp;
-                mainStore.serverToken.otpServerPort = serverPort;
-                mainStore.serverToken.encKey = jsonObj.encKey;
+                // mainStore.serverToken.otpServerIp = serverIP;
+                // mainStore.serverToken.otpServerPort = serverPort;
+                // mainStore.serverToken.encKey = jsonObj.encKey;
+
 
                 let saveServerInfo = {
-                    otpServerIp: serverIp,
+                    otpServerIp: serverIP,
                     otpServerPort: serverPort,
                     encKey: jsonObj.encKey,
+                    compCode: loginForm.compCode,
                 };
 
                 mainStore.saveServerStore(saveServerInfo).then(() => {
                     try {
+
+                        // alert(JSON.stringify(saveServerInfo));
                         mainStore.resetUserStore();
                         // navigation.dispatch(resetAction);
                         // alert(JSON.stringify(settingForm.serverToken));
+
+                        Toast.show({
+                            text: "정상적으로 설정되었습니다.",
+                            duration: 5000,
+                            position: "top",
+                            type: "success",
+                            textStyle: { textAlign: "center" },
+                        });
+
                     } catch(e) {
                         // alert(JSON.stringify(e));
                     }
+                // }).catch(err => {
+                //     alert(JSON.stringify(err));
                 });
 
             }).catch(err => {
+                // alert(JSON.stringify(err));
                 Toast.show({
-                    text: "OTP Server error!",
-                    duration: 2000,
+                    text: "OTP 서버 오류",
+                    duration: 5000,
                     position: "top",
                     type: "danger",
                     textStyle: { textAlign: "center" },
                 });
             });
-        } else {
+
+        }).catch(err => {
+            let errorMsg = "라이선스 서버 에러";
+            if(err === "COMPCODE-ERR") {
+                errorMsg = "회사코드를 다시 확인해 주세요.";
+            }
+
             Toast.show({
-                text: "Server IP or Port invalid!",
-                duration: 2000,
+                text: errorMsg,
+                duration: 5000,
                 position: "top",
                 type: "danger",
                 textStyle: { textAlign: "center" },
             });
-        }
+        });
+
     }
 
     render() {
@@ -241,7 +320,7 @@ export default class LoginContainer extends React.Component {
                         <Icon active name="person" style={{ color: "lightgray" }} />
                         <Input
                             style={{ marginTop: -5, color: "lightgray" }}
-                            placeholder="Username"
+                            placeholder="아이디"
                             placeholderTextColor="#c9c9c9"
                             keyboardType="email-address"
                             autoCapitalize = "none"
@@ -257,7 +336,7 @@ export default class LoginContainer extends React.Component {
                         <Icon active name="unlock" style={{ color: "lightgray" }} />
                         <Input
                             style={{ marginTop: -5, marginLeft: 3, color: "lightgray" }}
-                            placeholder="Password"
+                            placeholder="비밀번호"
                             placeholderTextColor="#c9c9c9"
                             autoCapitalize = "none"
                             value={loginForm.password}
@@ -272,36 +351,60 @@ export default class LoginContainer extends React.Component {
         );
 
         let settingForm = (
-            <Form>
-                <View style={{ marginHorizontal: 8, marginTop: 16, marginBottom: 8 }}>
-                    <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
-                        <Icon type={"FontAwesome"} active name="server" style={{ color: "lightgray" }} />
-                        <Input
-                            style={{ marginTop: -5}}
-                            placeholder="Server IP"
-                            placeholderTextColor="#c9c9c9"
-                            // keyboardType="numeric"
-                            value={ loginForm.serverIp }
-                            // onChangeText={ e => this.setState({serverIp: e}) }
-                            onChangeText={e => loginForm.serverIpOnChange(e) }
-                        />
-                    </Item>
-                </View>
-                <View style={{ marginHorizontal: 8, marginBottom: 8 }}>
-                    <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
-                        <Icon type={"FontAwesome"} active name="th-large" style={{ color: "lightgray" }} />
-                        <Input
-                            style={{ marginTop: -5}}
-                            placeholder="Server Port"
-                            placeholderTextColor="#c9c9c9"
-                            keyboardType="numeric"
-                            value={ loginForm.serverPort }
-                            // onChangeText={ e => this.setState({serverPort: e}) }
-                            onChangeText={e => loginForm.serverPortOnChange(e) }
-                        />
-                    </Item>
-                </View>
-            </Form>
+            <View style={{ alignItems: "center",  marginHorizontal: 8, marginTop: 16, marginBottom: 18 }}>
+                <Text style={{
+                    color: "white",
+                    // fontWeight: "bold",
+                    fontSize: 18,
+                    marginBottom: 8,
+                }}>회사 코드</Text>
+                <SmoothPinCodeInput // password mask="﹡"
+                                    cellSize={45}
+                                    codeLength={6}
+                                    value={loginForm.compCode}
+                                    cellStyle={{
+                                        borderWidth: 2,
+                                        borderRadius: 5,
+                                        borderColor: 'grey',
+                                        backgroundColor: 'white',
+                                    }}
+                                    cellStyleFocused={{
+                                        borderWidth: 2,
+                                        borderColor: 'black',
+                                        backgroundColor: 'white',
+                                    }}
+                                    onTextChange={code => loginForm.compCodeOnChange(code)}/>
+            </View>
+            // <Form>
+            //     <View style={{ marginHorizontal: 8, marginTop: 16, marginBottom: 8 }}>
+            //         <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
+            //             <Icon type={"FontAwesome"} active name="server" style={{ color: "lightgray" }} />
+            //             <Input
+            //                 style={{ marginTop: -5}}
+            //                 placeholder="Server IP"
+            //                 placeholderTextColor="#c9c9c9"
+            //                 // keyboardType="numeric"
+            //                 value={ loginForm.serverIp }
+            //                 // onChangeText={ e => this.setState({serverIp: e}) }
+            //                 onChangeText={e => loginForm.serverIpOnChange(e) }
+            //             />
+            //         </Item>
+            //     </View>
+            //     <View style={{ marginHorizontal: 8, marginBottom: 8 }}>
+            //         <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
+            //             <Icon type={"FontAwesome"} active name="th-large" style={{ color: "lightgray" }} />
+            //             <Input
+            //                 style={{ marginTop: -5}}
+            //                 placeholder="Server Port"
+            //                 placeholderTextColor="#c9c9c9"
+            //                 keyboardType="numeric"
+            //                 value={ loginForm.serverPort }
+            //                 // onChangeText={ e => this.setState({serverPort: e}) }
+            //                 onChangeText={e => loginForm.serverPortOnChange(e) }
+            //             />
+            //         </Item>
+            //     </View>
+            // </Form>
         );
         return <Login navigation={this.props.navigation}
                       isServerSet={ mainStore.isServerSet }
