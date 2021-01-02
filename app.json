@@ -29,7 +29,7 @@
         "image": "./assets/argusotp-splash.png"
       },
       "icon": "./assets/argus-icon.icns",
-      "buildNumber": "100"
+      "buildNumber": "201"
     },
     "android": {
       "package": "kr.co.cielcloud.argusotp",
@@ -57,9 +57,9 @@
         "xxhdpi": "./assets/argusotp-splash.png",
         "xxxhdpi": "./assets/argusotp-splash.png"
       },
-      "versionCode": 100
+      "versionCode": 201
     },
-    "version": "1.0.0",
+    "version": "2.0.1",
     "splash": {
       "backgroundColor": "#ffffff",
       "resizeMode": "contain",

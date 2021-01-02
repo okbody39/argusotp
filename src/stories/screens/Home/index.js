@@ -593,11 +593,8 @@ class Home extends React.Component {
                                                 }, 100);
 
                                             }} >
-                                        {/*<Icon name='time' />*/}
-                                        {/*<Text>Time Sync (diff: {Math.abs(this.state.timeDiff) > 1000 ? (this.state.timeDiff/1000).toFixed(0) + " sec" : this.state.timeDiff + " ms"})</Text>*/}
-                                        <Text>로그아웃</Text>
+                                        <Text>로그아웃 ( {mainStore.userToken.userId} )</Text>
                                     </Button>
-
                                 </View>
                                 : null
                         }

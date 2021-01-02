@@ -31,6 +31,7 @@ import PINSetting from "../../../component/PINSetting";
 const platform = Platform.OS;
 import styles from "./styles";
 import CardFlip from "react-native-card-flip";
+import NativeWebSocketModule from "react-native/Libraries/WebSocket/NativeWebSocketModule";
 
 let Password1 = '';
 
@@ -51,6 +52,9 @@ const LockSet = (props) => {
     const [compatible, setCompatible] = useState(false);
     const [fingerprints, setFingerprints] = useState(false);
     const [result, setResult] = useState("");
+
+    const [isSet, setIsSet] = useState(false);
+
 
     let checkDeviceForHardware = async () => {
         let compatible = await LocalAuthentication.hasHardwareAsync();
@@ -89,7 +93,7 @@ const LockSet = (props) => {
         }
 
         let result = await LocalAuthentication.authenticateAsync(
-            Platform.OS === "ios" ? "지문을 입력해주세요" : "ArgusOTP 인증"
+            platform === "ios" ? "지문을 입력해주세요" : "ArgusOTP 인증"
         );
 
         if(result.success) {
@@ -144,14 +148,17 @@ const LockSet = (props) => {
 
                 // alert(code);
                 if(code === "__BIOAUTH__") {
+                    setIsSet(true);
                     setStep(2);
                     setMessage("사용하실 PIN을 입력하세요.");
                 } else if(code) {
                     // 현재 PIN이 있는 경우 - 현재 PIN 입력
+                    setIsSet(true);
                     setStep(1);
                     setPinCode(code);
                 } else {
                     // 현재 PIN이 없는 경우 - 현재 PIN입력 SKIP
+                    setIsSet(false);
                     setStep(2);
                     setMessage("사용하실 PIN을 입력하세요.");
                 }
@@ -284,6 +291,8 @@ const LockSet = (props) => {
 
     };
 
+    let primaryColor = platform === "ios" ? "#007aff" : "#3F51B5";
+
     return (
         <Container style={{ backgroundColor: "#2D2B2C" }} >
             <Content padder>
@@ -298,10 +307,10 @@ const LockSet = (props) => {
                     </Text>
                 </View>
                 <Segment style={{ height: 50, marginBottom: 10 }}>
-                    <Button first active={type === 0}  style={{ height: 35 }} onPress={()=>setType(0)}>
+                    <Button first active={type === 0}  style={{ height: 35, backgroundColor: type === 0 ? primaryColor : "white" }} onPress={()=>setType(0)}>
                         <Text>생체인증</Text>
                     </Button>
-                    <Button last active={type === 1} style={{ height: 35 }} onPress={()=>setType(1)}>
+                    <Button last active={type === 1} style={{ height: 35, backgroundColor: type === 1 ? primaryColor : "white" }} onPress={()=>setType(1)}>
                         <Text>PIN코드</Text>
                     </Button>
                 </Segment>
@@ -362,34 +371,33 @@ const LockSet = (props) => {
                 {/*</Button>*/}
 
                 {
-                    type === 0 ?
-                        <>
-                            <Button rounded light block onPress={() => props.navigation.goBack() } style={{ marginBottom: 8 }}>
-                                <Text>취소</Text>
-                            </Button>
-                            {
-                                mandatory ? null :
+                    mandatory && !isSet? // 강제이고 현재 인증설정이 안된 경우
+                        <View style={{ alignItems: "center" }}>
+                            <Text style={{ color: "white" }}>인증 설정이 필요합니다! (필수) {pinCode}</Text>
+                        </View>
+                        :
+                        type === 0 ?
+                            <>
+                                <Button rounded light block onPress={() => props.navigation.goBack() } style={{ marginBottom: 8 }}>
+                                    <Text>취소</Text>
+                                </Button>
+                                { mandatory ? null :
                                     <Button rounded danger block onPress={() => clearLocalAuth()}>
                                         <Text>PIN 삭제</Text>
                                     </Button>
-
-                            }
-                        </>
-                        :
-                        <>
-                            <Button rounded light block onPress={() => props.navigation.goBack() } style={{ marginBottom: 8 }}>
-                                <Text>취소</Text>
-                            </Button>
-
-                            {
-                                mandatory ? null :
-
+                                }
+                            </>
+                            :
+                            <>
+                                <Button rounded light block onPress={() => props.navigation.goBack() } style={{ marginBottom: 8 }}>
+                                    <Text>취소</Text>
+                                </Button>
+                                { mandatory ? null :
                                     <Button rounded danger block onPress={() => clearPincode()}>
                                         <Text>PIN 삭제</Text>
                                     </Button>
-
-                            }
-                        </>
+                                }
+                            </>
                 }
 
 

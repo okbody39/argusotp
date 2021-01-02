@@ -4,6 +4,7 @@ import CryptoES from 'crypto-es';
 const ENC_KEY = "bf3c199c2470cb1759907b1e0905c17b";
 const IV = "5185207c72eec9e4";
 
+// License Server communication
 export function encryptStr(val) {
   // const cipher = crypto.createCipheriv('aes-256-cbc', ENC_KEY, IV);
   let value = null;
@@ -28,6 +29,7 @@ export function encryptStr(val) {
 
 }
 
+// License Server communication
 export function decryptStr(encVal, defaultVal) {
   // const decipher = crypto.createDecipheriv('aes-256-cbc', ENC_KEY, IV);
   // let decVal = decipher.update(encVal, 'base64', 'utf8');
@@ -58,6 +60,7 @@ export function decryptStr(encVal, defaultVal) {
 }
 
 
+// ArgusOTP Server communication
 export function encrypt (targetStr, encKey) {
 
   let key = aesjs.utils.utf8.toBytes(encKey);
@@ -70,6 +73,7 @@ export function encrypt (targetStr, encKey) {
   return encryptedHex;
 }
 
+// ArgusOTP Server communication
 export function decrypt (targetStr, encKey) {
 
   let key = aesjs.utils.utf8.toBytes(encKey);

@@ -1,23 +1,25 @@
-
 const __LICENSESERVER__ = "192.168.1.2:9000";
-
+const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 
 import * as React from "react";
 import Constants from 'expo-constants';
 import { Item, Input, Icon, Form, Toast, View, Button, Text } from "native-base";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
-import { AsyncStorage, Platform } from "react-native";
+import {Alert, AsyncStorage, Platform} from "react-native";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 
 import SmoothPinCodeInput from "react-native-smooth-pincode-input";
 
-import { encrypt, decrypt, encryptStr, decryptStr} from "../../utils/crypt";
+import {
+    encrypt, decrypt, // ArgusOTP Server communication
+    encryptStr, decryptStr // License Server communication
+} from "../../utils/crypt";
+
 import Login from "../../stories/screens/Login";
 
 const platform = Platform.OS;
-const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 
 @inject("loginForm", "mainStore")
 @observer
@@ -38,6 +40,8 @@ export default class LoginContainer extends React.Component {
             serverIp: loginForm.serverIp || "",
             serverPort: loginForm.serverPort || "",
             settingMode: false,
+            // errorCount: 0,
+            // errorLastDate: new Date().getTime(),
         }
 
         this._bootstrapAsync();
@@ -70,6 +74,25 @@ export default class LoginContainer extends React.Component {
         mainStore.loadStore();
 
         loginForm.compCodeOnChange(mainStore.serverToken.compCode);
+
+        // AsyncStorage.getItem("@SeedAuthStore:errorCount").then(errText => {
+        //     let errJson = JSON.parse(errText);
+        //     let errCnt = 0;
+        //     let errDate = new Date().getTime();
+        //
+        //
+        //     if(errJson.cnt) {
+        //         errCnt = parseInt(errJson.cnt);
+        //         errDate = errJson.dt;
+        //     }
+        //
+        //     this.setState({
+        //         errorCount: errCnt,
+        //         errorLastDate: errDate,
+        //     });
+        //
+        // });
+
 
     };
 
@@ -164,8 +187,6 @@ export default class LoginContainer extends React.Component {
                 mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
                     // setTimeout(() => {
 
-                    // alert(">>> 1 <<<" + JSON.stringify(mainStore));
-
                     navigation.navigate("Home");
                     // }, 500);
                 });
@@ -193,13 +214,11 @@ export default class LoginContainer extends React.Component {
         const { loginForm, mainStore } = this.props;
         const { serverIp, serverPort } = loginForm;
 
-        // alert(JSON.stringify(mainStore));
-
         let data = {
             username: "",
             sitecode: loginForm.compCode,
             pushtoken: loginForm.userToken.pushToken,
-            deviceid: loginForm.userToken.deviceid,
+            deviceid: loginForm.userToken.deviceId,
             app: "ArgusOTP",
             appversion: Constants.manifest.version,
             phone: "",
@@ -209,6 +228,7 @@ export default class LoginContainer extends React.Component {
 
         axios.get("http://" + __LICENSESERVER__+ "/api/register?enc="+enc, {
             // enc : enc,
+            timeout: 3000,
             crossdomain: true,
         }).then(rst => {
             let result = {
@@ -220,18 +240,17 @@ export default class LoginContainer extends React.Component {
 
             try {
                 result = decryptStr(rst.data, result);
+                result.desc = JSON.parse(result.desc);
             } catch(e) {
                 throw "COMPCODE-ERR";
             }
 
-            result.desc = JSON.parse(result.desc);
-
-            // alert(result.desc.serverIP + ":" + result.desc.serverPort);
+            if(!result.desc.serverIP) {
+                throw "COMPCODE-ERR";
+            }
 
             let serverIP = result.desc.serverIP;
             let serverPort = result.desc.serverPort;
-
-
 
             if(serverIP && serverPort) {
                 //
@@ -239,73 +258,114 @@ export default class LoginContainer extends React.Component {
                 throw "COMPCODE-ERR";
             }
 
-            axios.get("http://" + serverIP + ":" + serverPort + "/otp/encryptKey", {
-                crossdomain: true,
-            }).then(res => {
-                const result = res.data;
+            Alert.alert(
+                '확인',
+                `당신은 [${result.sitename}]의 사용자가 맞습니까?`,
+                [
+                    {
+                        text: '아니오',
+                        onPress: () => {
+                            Toast.show({
+                                text: '회사코드를 다시 확인해주세요.',
+                                position: "top",
+                                // buttonText: "OK",
+                                type: "warning",
+                                duration: 2000,
+                                textStyle: { textAlign: "center" },
+                            });
+                        },
+                        style: 'cancel'
+                    },
+                    { text: '맞습니다',
+                        onPress: () => {
+                            axios.get("http://" + serverIP + ":" + serverPort + "/otp/encryptKey", {
+                                crossdomain: true,
+                            }).then(res => {
+                                const result = res.data;
 
-                let jsonText = decrypt(result, _DEFAULT_KEY_);
-                let jsonObj = JSON.parse(jsonText);
+                                let jsonText = decrypt(result, _DEFAULT_KEY_);
+                                let jsonObj = JSON.parse(jsonText);
 
-                // mainStore.serverToken.otpServerIp = serverIP;
-                // mainStore.serverToken.otpServerPort = serverPort;
-                // mainStore.serverToken.encKey = jsonObj.encKey;
+                                let saveServerInfo = {
+                                    otpServerIp: serverIP,
+                                    otpServerPort: serverPort,
+                                    encKey: jsonObj.encKey,
+                                    compCode: loginForm.compCode,
+                                };
 
+                                mainStore.saveServerStore(saveServerInfo).then(() => {
+                                    try {
 
-                let saveServerInfo = {
-                    otpServerIp: serverIP,
-                    otpServerPort: serverPort,
-                    encKey: jsonObj.encKey,
-                    compCode: loginForm.compCode,
-                };
+                                        mainStore.resetUserStore();
+                                        AsyncStorage.removeItem("@SeedAuthStore:errorCount");
 
-                mainStore.saveServerStore(saveServerInfo).then(() => {
-                    try {
+                                        Toast.show({
+                                            text: "정상적으로 설정되었습니다.",
+                                            duration: 5000,
+                                            position: "top",
+                                            type: "success",
+                                            textStyle: { textAlign: "center" },
+                                        });
 
-                        // alert(JSON.stringify(saveServerInfo));
-                        mainStore.resetUserStore();
-                        // navigation.dispatch(resetAction);
-                        // alert(JSON.stringify(settingForm.serverToken));
+                                    } catch(e) {
+                                        // alert(JSON.stringify(e));
+                                    }
+                                });
 
-                        Toast.show({
-                            text: "정상적으로 설정되었습니다.",
-                            duration: 5000,
-                            position: "top",
-                            type: "success",
-                            textStyle: { textAlign: "center" },
-                        });
-
-                    } catch(e) {
-                        // alert(JSON.stringify(e));
+                            }).catch(err => {
+                                // alert(JSON.stringify(err));
+                                Toast.show({
+                                    text: "OTP 서버 오류",
+                                    duration: 5000,
+                                    position: "top",
+                                    type: "danger",
+                                    textStyle: { textAlign: "center" },
+                                });
+                            });
+                        }
                     }
-                // }).catch(err => {
-                //     alert(JSON.stringify(err));
+                ],
+                { cancelable: false }
+            );
+
+        }).catch(err => {
+            if(err === "COMPCODE-ERR") {
+
+                AsyncStorage.getItem("@SeedAuthStore:errorCount").then(errText => {
+                    let errJson = JSON.parse(errText);
+                    let errCnt = 0;
+                    let errDate = new Date().getTime();
+
+                    if(errJson && errJson.cnt) {
+                        errCnt = errJson.cnt;
+                        errDate = errJson.cnt > 5 ? errDate : errJson.dt;
+                    }
+
+                    errCnt ++;
+
+                    Toast.show({
+                        text: "회사코드를 다시 확인해 주세요. "  + (errCnt > 1 ? "(" + errCnt + " / 5)" : "" ),
+                        duration: 5000,
+                        position: "top",
+                        type: "danger",
+                        textStyle: { textAlign: "center" },
+                    });
+
+                    AsyncStorage.setItem("@SeedAuthStore:errorCount", JSON.stringify({ cnt: errCnt, dt: errDate }));
+
                 });
 
-            }).catch(err => {
-                // alert(JSON.stringify(err));
+            } else {
                 Toast.show({
-                    text: "OTP 서버 오류",
+                    text: "라이선스 서버 에러",
                     duration: 5000,
                     position: "top",
                     type: "danger",
                     textStyle: { textAlign: "center" },
                 });
-            });
-
-        }).catch(err => {
-            let errorMsg = "라이선스 서버 에러";
-            if(err === "COMPCODE-ERR") {
-                errorMsg = "회사코드를 다시 확인해 주세요.";
             }
 
-            Toast.show({
-                text: errorMsg,
-                duration: 5000,
-                position: "top",
-                type: "danger",
-                textStyle: { textAlign: "center" },
-            });
+
         });
 
     }
@@ -375,42 +435,49 @@ export default class LoginContainer extends React.Component {
                                     }}
                                     onTextChange={code => loginForm.compCodeOnChange(code)}/>
             </View>
-            // <Form>
-            //     <View style={{ marginHorizontal: 8, marginTop: 16, marginBottom: 8 }}>
-            //         <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
-            //             <Icon type={"FontAwesome"} active name="server" style={{ color: "lightgray" }} />
-            //             <Input
-            //                 style={{ marginTop: -5}}
-            //                 placeholder="Server IP"
-            //                 placeholderTextColor="#c9c9c9"
-            //                 // keyboardType="numeric"
-            //                 value={ loginForm.serverIp }
-            //                 // onChangeText={ e => this.setState({serverIp: e}) }
-            //                 onChangeText={e => loginForm.serverIpOnChange(e) }
-            //             />
-            //         </Item>
-            //     </View>
-            //     <View style={{ marginHorizontal: 8, marginBottom: 8 }}>
-            //         <Item rounded style={{ paddingLeft: 8, paddingTop: 0, backgroundColor: "white" }}>
-            //             <Icon type={"FontAwesome"} active name="th-large" style={{ color: "lightgray" }} />
-            //             <Input
-            //                 style={{ marginTop: -5}}
-            //                 placeholder="Server Port"
-            //                 placeholderTextColor="#c9c9c9"
-            //                 keyboardType="numeric"
-            //                 value={ loginForm.serverPort }
-            //                 // onChangeText={ e => this.setState({serverPort: e}) }
-            //                 onChangeText={e => loginForm.serverPortOnChange(e) }
-            //             />
-            //         </Item>
-            //     </View>
-            // </Form>
         );
-        return <Login navigation={this.props.navigation}
+
+        return (<Login navigation={this.props.navigation}
                       isServerSet={ mainStore.isServerSet }
                       loginForm={ Fields }
                       settingForm={ settingForm }
                       onLogin={() => this.login() }
-                      onSave={() => this.onSave() } />;
+                      onSave={() => {
+                          AsyncStorage.getItem("@SeedAuthStore:errorCount").then(errText => {
+                              let errJson = JSON.parse(errText);
+                              let errCnt = 0;
+                              let errDate = new Date().getTime();
+
+                              if(errJson && errJson.cnt) {
+                                  errCnt = errJson.cnt;
+                                  errDate = errJson.dt;
+                              }
+
+                              // alert(errCnt+" ::: " +errDate);
+
+                              // 5회 이상이면 10분 미만
+                              if(errCnt >= 5) {
+                                  let curTime = new Date().getTime();
+
+                                  if((curTime - errDate) < (10 * 60 * 1000)) {
+                                      Toast.show({
+                                          text: "최대 시도횟수 초과! (10분후 가능)",
+                                          duration: 10000,
+                                          position: "top",
+                                          type: "danger",
+                                          textStyle: { textAlign: "center" },
+                                      });
+
+                                      return;
+
+                                  }
+                              }
+
+                              // 5회 이상이고 10분 지났으면
+                              // 5회 미만
+
+                              this.onSave();
+                          });
+                      }} />);
     }
 }
