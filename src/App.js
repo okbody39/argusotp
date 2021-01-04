@@ -1,11 +1,15 @@
 import React from "react";
 
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { createStackNavigator } from 'react-navigation-stack';
+import { createStackNavigator, TransitionPresets } from 'react-navigation-stack';
 import Login from "./container/LoginContainer";
 import Home from "./container/HomeContainer";
 import LockSet from "./container/LockSetContainer";
-
+/*
+options={{
+    cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid,
+  }}
+ */
 const AppStack = createStackNavigator(
 	{
 		Home: { screen: Home },
@@ -16,6 +20,13 @@ const AppStack = createStackNavigator(
 	{
 		initialRouteName: "Login",
 		headerMode: "none",
+		// navigationOptions: ({ navigation }) => ({
+		// 	...TransitionPresets.SlideFromRightIOS
+		// }),
+		defaultNavigationOptions: ({navigation}) => ({
+			// animationEnabled: false,
+			...TransitionPresets.ModalSlideFromBottomIOS
+		})
 	}
 );
 

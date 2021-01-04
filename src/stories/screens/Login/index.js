@@ -59,7 +59,7 @@ class Login extends React.Component {
 					// behavior={null}
 					// keyboardVerticalOffset={60}
 					style={{ backgroundColor: "#2D2B2C" }}>
-					<View padder style={{ backgroundColor: "#60B0F4", borderTopLeftRadius: 30, borderTopRightRadius: 30, height: settingMode ? 480 : 65 }}>
+					<View padder style={{ backgroundColor: "#60B0F4", borderTopLeftRadius: 30, borderTopRightRadius: 30, height: settingMode ? 525 : 65 }}>
 						<Button transparent block info onPress={() => this.setState({ settingMode : !settingMode })}>
 							<Text style={{ color: "white", fontWeight: "bold" }}>
 								{ settingMode ? "닫기" : "설정" }

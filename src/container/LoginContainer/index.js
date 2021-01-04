@@ -1,4 +1,6 @@
-const __LICENSESERVER__ = "192.168.1.2:9000";
+import {NavigationActions, StackActions} from "react-navigation";
+
+const __LICENSESERVER__ = "argus.cielcloud.co.kr:9000";
 const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 
 import * as React from "react";
@@ -112,7 +114,17 @@ export default class LoginContainer extends React.Component {
         const { loginForm, navigation, mainStore } = this.props;
 
         if (mainStore.isServerSet && mainStore.isLogin) {
-            navigation.navigate("Home");
+            // navigation.navigate("Home");
+            setTimeout(() => {
+                this.props.navigation.dispatch(
+                    StackActions.reset(
+                        {
+                            index: 0,
+                            key: null,
+                            actions: [NavigationActions.navigate({ routeName: "Home"})],
+                        })
+                );
+            }, 100);
         }
     }
 
@@ -185,10 +197,16 @@ export default class LoginContainer extends React.Component {
                 // alert(JSON.stringify(mainStore.serverToken));
 
                 mainStore.saveStore(loginForm.userToken, mainStore.serverToken).then(() => {
-                    // setTimeout(() => {
-
-                    navigation.navigate("Home");
-                    // }, 500);
+                    setTimeout(() => {
+                        this.props.navigation.dispatch(
+                            StackActions.reset(
+                                {
+                                    index: 0,
+                                    key: null,
+                                    actions: [NavigationActions.navigate({ routeName: "Home"})],
+                                })
+                        );
+                    }, 100);
                 });
 
             } else {
@@ -461,7 +479,7 @@ export default class LoginContainer extends React.Component {
 
                                   if((curTime - errDate) < (10 * 60 * 1000)) {
                                       Toast.show({
-                                          text: "최대 시도횟수 초과! (10분후 가능)",
+                                          text: "최대 시도횟수 초과! ("+Math.round(10-((curTime - errDate)/1000/60), 0)+"분후 가능)",
                                           duration: 10000,
                                           position: "top",
                                           type: "danger",

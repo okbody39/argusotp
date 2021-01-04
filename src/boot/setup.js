@@ -11,9 +11,6 @@ import variables from "../theme/variables/platform";
 
 export default function(stores) {
 	return class Setup extends React.Component {
-		state: {
-			isReady: boolean,
-		};
 		constructor() {
 			super();
 			this.state = {
@@ -27,7 +24,7 @@ export default function(stores) {
 
 		async loadFonts() {
 			await Font.loadAsync({
-				// Roboto: require("native-base/Fonts/Roboto.ttf"),
+				Roboto: require("native-base/Fonts/Roboto.ttf"),
 				Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
 				// Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf"),
 			});

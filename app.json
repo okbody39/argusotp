@@ -28,7 +28,7 @@
         "resizeMode": "contain",
         "image": "./assets/argusotp-splash.png"
       },
-      "icon": "./assets/argus-icon.icns",
+      "icon": "./assets/argus-icon-ios.png",
       "buildNumber": "201"
     },
     "android": {

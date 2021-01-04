@@ -264,7 +264,18 @@ class Home extends React.Component {
                 // });
             } else {
                 if(this.props.mainStore.serverToken.pincodeUse === "true") {
-                    this.props.navigation.navigate("LockSet");
+
+                    // this.props.navigation.navigate("LockSet");
+                    setTimeout(() => {
+                        this.props.navigation.dispatch(
+                            StackActions.reset(
+                                {
+                                    index: 0,
+                                    key: null,
+                                    actions: [NavigationActions.navigate({ routeName: "LockSet"})],
+                                })
+                        );
+                    }, 100);
                 }
             }
 
@@ -281,7 +292,17 @@ class Home extends React.Component {
             const { mainStore, navigation } = this.props;
 
             if (!mainStore.isServerSet) {
-                navigation.navigate("Login");
+                // navigation.navigate("Login");
+                setTimeout(() => {
+                    this.props.navigation.dispatch(
+                        StackActions.reset(
+                            {
+                                index: 0,
+                                key: null,
+                                actions: [NavigationActions.navigate({ routeName: "Login"})],
+                            })
+                    );
+                }, 100);
                 return;
             }
 
@@ -555,7 +576,17 @@ class Home extends React.Component {
                                                 this.setState({
                                                     settingMode: false,
                                                 });
-                                                this.props.navigation.navigate("LockSet");
+                                                // this.props.navigation.navigate("LockSet");
+                                                setTimeout(() => {
+                                                    this.props.navigation.dispatch(
+                                                        StackActions.reset(
+                                                            {
+                                                                index: 0,
+                                                                key: null,
+                                                                actions: [NavigationActions.navigate({ routeName: "LockSet"})],
+                                                            })
+                                                    );
+                                                }, 100);
                                             }} >
                                         {/*<Icon name='information-circle' />*/}
                                         <Text>인증 설정</Text>

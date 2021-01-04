@@ -112,7 +112,7 @@ export default class PINSetting extends React.Component {
         let line2 = [nums[4],nums[5],nums[6],nums[7],];
         let line3 = ["C",nums[8],nums[9],"B"];
 
-        const fields: JSX.Element[] = [];
+        const fields = [];
 
         for(let p=0 ; p < digits ; p++) {
             let name = "radio-button-off";

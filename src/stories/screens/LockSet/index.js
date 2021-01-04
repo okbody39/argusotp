@@ -32,6 +32,7 @@ const platform = Platform.OS;
 import styles from "./styles";
 import CardFlip from "react-native-card-flip";
 import NativeWebSocketModule from "react-native/Libraries/WebSocket/NativeWebSocketModule";
+import {NavigationActions, StackActions} from "react-navigation";
 
 let Password1 = '';
 
@@ -71,21 +72,23 @@ const LockSet = (props) => {
         if(!compatible){
             Alert.alert(
                 "생체 인증",
-                "이 단말기는 생체인증을 사용하실 수없습니다.",
+                "이 단말기는 생체인증을 사용하실 수 없습니다.",
                 [
-                    {text: "OK", onPress: () =>  props.navigation.goBack()}
+                    {text: "OK", onPress: () => setType(1)}
                 ],
                 {cancelable: false}
             );
             return;
+
+
         }
 
         if(!fingerprints){
             Alert.alert(
                 "생체 인증",
-                "생체인증 정보를을 사용하실 수없습니다.",
+                "생체인증 정보를 사용하실 수 없습니다.",
                 [
-                    {text: "OK", onPress: () =>  props.navigation.goBack()}
+                    {text: "OK", onPress: () => setType(1)}
                 ],
                 {cancelable: false}
             );
@@ -100,7 +103,8 @@ const LockSet = (props) => {
 
             AsyncStorage.setItem("@SeedAuthStore:lockToken", "__BIOAUTH__");
 
-            props.navigation.goBack();
+            // props.navigation.goBack();
+            goHome();
 
             Toast.show({
                 text: "생체인증으로 설정하였습니다.",
@@ -125,14 +129,6 @@ const LockSet = (props) => {
             }
         }
 
-
-
-
-        // setResult(result);
-        // console.log('Scan Result:', result);
-        // this.setState({
-        //     result: JSON.stringify(result),
-        // });
     };
 
     useEffect(() => {
@@ -212,6 +208,16 @@ const LockSet = (props) => {
                     });
 
                     props.navigation.navigate("Home", { action: "PASSCODE_CHANGE" });
+                    // setTimeout(() => {
+                    //     this.props.navigation.dispatch(
+                    //         StackActions.reset(
+                    //             {
+                    //                 index: 0,
+                    //                 key: null,
+                    //                 actions: [NavigationActions.navigate({ routeName: "Home"})],
+                    //             })
+                    //     );
+                    // }, 100);
 
                 } else {
 
@@ -250,7 +256,18 @@ const LockSet = (props) => {
                             textStyle: { textAlign: "center" },
                         });
 
-                        props.navigation.navigate("Home");
+                        // props.navigation.navigate("Home");
+                        setTimeout(() => {
+                            this.props.navigation.dispatch(
+                                StackActions.reset(
+                                    {
+                                        index: 0,
+                                        key: null,
+                                        actions: [NavigationActions.navigate({ routeName: "Home"})],
+                                    })
+                            );
+                        }, 100);
+
                     }
                 }
             ],
@@ -282,13 +299,40 @@ const LockSet = (props) => {
                             textStyle: { textAlign: "center" },
                         });
 
-                        props.navigation.navigate("Home");
+                        // props.navigation.navigate("Home");
+                        setTimeout(() => {
+                            props.navigation.dispatch(
+                                StackActions.reset(
+                                    {
+                                        index: 0,
+                                        key: null,
+                                        actions: [NavigationActions.navigate({ routeName: "Home"})],
+                                    })
+                            );
+                        }, 100);
                     }
                 }
             ],
             { cancelable: false }
         );
 
+    };
+
+    let goHome = () => {
+        // props.navigation.navigate("Home");
+
+        // 최초 설정이고 설정이 완료되지 않았으면 홈으로 이동하지 않습니다.
+
+        setTimeout(() => {
+            props.navigation.dispatch(
+                StackActions.reset(
+                    {
+                        index: 0,
+                        key: null,
+                        actions: [NavigationActions.navigate({ routeName: "Home"})],
+                    })
+            );
+        }, 100);
     };
 
     let primaryColor = platform === "ios" ? "#007aff" : "#3F51B5";
@@ -307,11 +351,15 @@ const LockSet = (props) => {
                     </Text>
                 </View>
                 <Segment style={{ height: 50, marginBottom: 10 }}>
-                    <Button first active={type === 0}  style={{ height: 35, backgroundColor: type === 0 ? primaryColor : "white" }} onPress={()=>setType(0)}>
-                        <Text>생체인증</Text>
+                    <Button first active={type === 0}
+                            style={{ height: 35, backgroundColor: type === 0 ? primaryColor : "white", borderColor: primaryColor }}
+                            onPress={()=>setType(0)}>
+                        <Text style={{ color: type === 0 ? "white" : primaryColor }}>생체인증</Text>
                     </Button>
-                    <Button last active={type === 1} style={{ height: 35, backgroundColor: type === 1 ? primaryColor : "white" }} onPress={()=>setType(1)}>
-                        <Text>PIN코드</Text>
+                    <Button last active={type === 1}
+                            style={{ height: 35, backgroundColor: type === 1 ? primaryColor : "white", borderColor: primaryColor }}
+                            onPress={()=>setType(1)}>
+                        <Text style={{ color: type === 1 ? "white" : primaryColor }}>PIN코드</Text>
                     </Button>
                 </Segment>
                 <View style={{ backgroundColor: "white", borderRadius: 10, paddingTop: 30, marginBottom: 30, height: 300 }} >
@@ -378,7 +426,7 @@ const LockSet = (props) => {
                         :
                         type === 0 ?
                             <>
-                                <Button rounded light block onPress={() => props.navigation.goBack() } style={{ marginBottom: 8 }}>
+                                <Button rounded light block onPress={() => goHome() } style={{ marginBottom: 8 }}>
                                     <Text>취소</Text>
                                 </Button>
                                 { mandatory ? null :
@@ -389,7 +437,7 @@ const LockSet = (props) => {
                             </>
                             :
                             <>
-                                <Button rounded light block onPress={() => props.navigation.goBack() } style={{ marginBottom: 8 }}>
+                                <Button rounded light block onPress={() => goHome() } style={{ marginBottom: 8 }}>
                                     <Text>취소</Text>
                                 </Button>
                                 { mandatory ? null :
