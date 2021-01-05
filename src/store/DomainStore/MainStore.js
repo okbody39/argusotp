@@ -20,8 +20,8 @@ class MainStore {
       this.isLogin = false;
       this.isServerSet = false;
 
-      let userToken = await AsyncStorage.getItem("@SeedAuthStore:userToken");
-      let serverToken = await AsyncStorage.getItem("@SeedAuthStore:serverToken");
+      let userToken = await AsyncStorage.getItem("@ArgusOTPStore:userToken");
+      let serverToken = await AsyncStorage.getItem("@ArgusOTPStore:serverToken");
 
       this.userToken = JSON.parse(userToken);
       this.serverToken = JSON.parse(serverToken);
@@ -60,7 +60,7 @@ class MainStore {
         userToken = JSON.stringify(_userToken);
       }
 
-      await AsyncStorage.setItem("@SeedAuthStore:userToken", userToken);
+      await AsyncStorage.setItem("@ArgusOTPStore:userToken", userToken);
       this.userToken = JSON.parse(userToken);
       this.isLogin = true;
     } catch (e) {
@@ -79,7 +79,7 @@ class MainStore {
       //
       // // console.log(serverToken);
       //
-      // await AsyncStorage.setItem("@SeedAuthStore:serverToken", serverToken);
+      // await AsyncStorage.setItem("@ArgusOTPStore:serverToken", serverToken);
       // this.serverToken = JSON.parse(serverToken);
       // this.isServerSet = true;
 
@@ -88,7 +88,7 @@ class MainStore {
 
       let serverToken = _.merge(this.serverToken, _serverToken);
 
-      await AsyncStorage.setItem("@SeedAuthStore:serverToken", JSON.stringify(serverToken));
+      await AsyncStorage.setItem("@ArgusOTPStore:serverToken", JSON.stringify(serverToken));
       this.serverToken = serverToken;
       this.isServerSet = true;
 
@@ -102,8 +102,8 @@ class MainStore {
   @action
   async resetStore() {
     try {
-      await AsyncStorage.removeItem("@SeedAuthStore:userToken");
-      await AsyncStorage.removeItem("@SeedAuthStore:serverToken");
+      await AsyncStorage.removeItem("@ArgusOTPStore:userToken");
+      await AsyncStorage.removeItem("@ArgusOTPStore:serverToken");
       this.userToken = {};
       this.serverToken = {};
       this.isLogin = false;
@@ -116,7 +116,7 @@ class MainStore {
   @action
   async resetUserStore() {
     try {
-      await AsyncStorage.removeItem("@SeedAuthStore:userToken");
+      await AsyncStorage.removeItem("@ArgusOTPStore:userToken");
       this.userToken = {};
       this.isLogin = false;
     } catch (e) {
@@ -127,7 +127,7 @@ class MainStore {
   // @action
   // async resetServerStore() {
   //   try {
-  //     await AsyncStorage.removeItem("@SeedAuthStore:serverToken");
+  //     await AsyncStorage.removeItem("@ArgusOTPStore:serverToken");
   //     this.serverToken = {};
   //     this.isServerSet = false;
   //   } catch (e) {

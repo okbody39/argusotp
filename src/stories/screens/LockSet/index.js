@@ -101,7 +101,7 @@ const LockSet = (props) => {
 
         if(result.success) {
 
-            AsyncStorage.setItem("@SeedAuthStore:lockToken", "__BIOAUTH__");
+            AsyncStorage.setItem("@ArgusOTPStore:lockToken", "__BIOAUTH__");
 
             // props.navigation.goBack();
             goHome();
@@ -135,12 +135,12 @@ const LockSet = (props) => {
         checkDeviceForHardware();
         checkForFingerprints();
 
-        AsyncStorage.getItem("@SeedAuthStore:serverToken").then((tokenStr) => {
+        AsyncStorage.getItem("@ArgusOTPStore:serverToken").then((tokenStr) => {
             let token = JSON.parse(tokenStr);
             setMandatory(token.pincodeUse === "true");
             setDigits(parseInt(token.pincodeDigits || "4"));
 
-            AsyncStorage.getItem("@SeedAuthStore:lockToken").then((code) => {
+            AsyncStorage.getItem("@ArgusOTPStore:lockToken").then((code) => {
 
                 // alert(code);
                 if(code === "__BIOAUTH__") {
@@ -194,7 +194,7 @@ const LockSet = (props) => {
             } else if (step === 3) {
                 if ( enteredPin === Password1 ) {
 
-                    AsyncStorage.setItem("@SeedAuthStore:lockToken", enteredPin);
+                    AsyncStorage.setItem("@ArgusOTPStore:lockToken", enteredPin);
 
                     Password1 = '';
 
@@ -245,7 +245,7 @@ const LockSet = (props) => {
                 },
                 { text: 'OK',
                     onPress: () => {
-                        AsyncStorage.removeItem("@SeedAuthStore:lockToken");
+                        AsyncStorage.removeItem("@ArgusOTPStore:lockToken");
 
                         Toast.show({
                             text: 'PIN을 삭제하였습니다.',
@@ -288,7 +288,7 @@ const LockSet = (props) => {
                 },
                 { text: 'OK',
                     onPress: () => {
-                        AsyncStorage.removeItem("@SeedAuthStore:lockToken");
+                        AsyncStorage.removeItem("@ArgusOTPStore:lockToken");
 
                         Toast.show({
                             text: '생체 인증을 삭제하였습니다.',

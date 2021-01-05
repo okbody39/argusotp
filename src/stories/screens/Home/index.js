@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Updates } from 'expo';
+import * as Updates from 'expo-updates';
 import {
     Container, Header, Title, Content,
     Text, Button, Icon, Left, Body, Right,
@@ -164,11 +164,10 @@ class Home extends React.Component {
                       {
                           text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
                               if (remotePincodeDigits !== myPincodeDigits) {
-                                  AsyncStorage.removeItem("@SeedAuthStore:lockToken").then(() => {
-                                      Updates.reload();
-                                  });
+                                  AsyncStorage.removeItem("@ArgusOTPStore:lockToken");
+                                  setTimeout( () => Updates.reloadAsync(), 500);
                               } else {
-                                  Updates.reload();
+                                  setTimeout( () => Updates.reloadAsync(), 500);
                               }
 
                           })
@@ -186,7 +185,7 @@ class Home extends React.Component {
                   [
                       {
                           text: 'Restart', onPress: () => mainStore.resetUserStore().then(() => {
-                              Updates.reload();
+                              setTimeout( () => Updates.reloadAsync(), 500);
                           })
                       },
                   ],
@@ -201,9 +200,8 @@ class Home extends React.Component {
                     [
                         {
                             text: 'Restart', onPress: () => {
-                                AsyncStorage.removeItem("@SeedAuthStore:lockToken").then(() => {
-                                    Updates.reload();
-                                });
+                                AsyncStorage.removeItem("@ArgusOTPStore:lockToken");
+                                setTimeout(() => Updates.reloadAsync(), 500);
                             }
                         },
                     ],
@@ -223,7 +221,7 @@ class Home extends React.Component {
                   [
                       {
                           text: 'Exit', onPress: () => mainStore.resetUserStore().then(() => {
-                              Updates.reload();
+                              setTimeout( () => Updates.reloadAsync(), 500);
                           })
                       },
                   ],
@@ -249,7 +247,7 @@ class Home extends React.Component {
 
         // AppState.addEventListener('change', this._handleAppStateChange);
 
-        AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+        AsyncStorage.getItem("@ArgusOTPStore:lockToken").then((lockPass) => {
 
             if(lockPass) {
                 this.setState({
@@ -380,7 +378,7 @@ class Home extends React.Component {
 
             <Container style={styles.container}  style={{ backgroundColor: "#2D2B2C" }}>
                 <NavigationEvents onDidFocus={() => {
-                    AsyncStorage.getItem("@SeedAuthStore:lockToken").then((lockPass) => {
+                    AsyncStorage.getItem("@ArgusOTPStore:lockToken").then((lockPass) => {
                         if(lockPass) {
                             // alert(lockPass);
                             this.setState({

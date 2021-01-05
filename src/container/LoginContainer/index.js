@@ -67,17 +67,27 @@ export default class LoginContainer extends React.Component {
             return;
         }
 
+        if (Platform.OS === 'android') {
+            await Notifications.setNotificationChannelAsync('default', {
+                name: 'default',
+                sound: true,
+                // importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#0080FF',
+            });
+        }
+
         const token = await Notifications.getExpoPushTokenAsync();
         loginForm.setPushInfo(token);
 
         const deviceId = Constants.deviceId;
         loginForm.setDeviceId(deviceId);
 
-        mainStore.loadStore();
+        await mainStore.loadStore();
 
         loginForm.compCodeOnChange(mainStore.serverToken.compCode);
 
-        // AsyncStorage.getItem("@SeedAuthStore:errorCount").then(errText => {
+        // AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
         //     let errJson = JSON.parse(errText);
         //     let errCnt = 0;
         //     let errDate = new Date().getTime();
@@ -315,7 +325,7 @@ export default class LoginContainer extends React.Component {
                                     try {
 
                                         mainStore.resetUserStore();
-                                        AsyncStorage.removeItem("@SeedAuthStore:errorCount");
+                                        AsyncStorage.removeItem("@ArgusOTPStore:errorCount");
 
                                         Toast.show({
                                             text: "정상적으로 설정되었습니다.",
@@ -349,7 +359,7 @@ export default class LoginContainer extends React.Component {
         }).catch(err => {
             if(err === "COMPCODE-ERR") {
 
-                AsyncStorage.getItem("@SeedAuthStore:errorCount").then(errText => {
+                AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
                     let errJson = JSON.parse(errText);
                     let errCnt = 0;
                     let errDate = new Date().getTime();
@@ -369,7 +379,7 @@ export default class LoginContainer extends React.Component {
                         textStyle: { textAlign: "center" },
                     });
 
-                    AsyncStorage.setItem("@SeedAuthStore:errorCount", JSON.stringify({ cnt: errCnt, dt: errDate }));
+                    AsyncStorage.setItem("@ArgusOTPStore:errorCount", JSON.stringify({ cnt: errCnt, dt: errDate }));
 
                 });
 
@@ -461,7 +471,7 @@ export default class LoginContainer extends React.Component {
                       settingForm={ settingForm }
                       onLogin={() => this.login() }
                       onSave={() => {
-                          AsyncStorage.getItem("@SeedAuthStore:errorCount").then(errText => {
+                          AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
                               let errJson = JSON.parse(errText);
                               let errCnt = 0;
                               let errDate = new Date().getTime();
