@@ -236,7 +236,7 @@ class Home extends React.Component {
 
                 this.setState({
                     timeDiff: diff,
-                    title: jsonObj.owner || "SeedAuth",
+                    title: jsonObj.owner || "ArgusOTP",
                 });
             }, 500);
 
