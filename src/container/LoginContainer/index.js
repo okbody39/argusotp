@@ -85,6 +85,8 @@ export default class LoginContainer extends React.Component {
 
         await mainStore.loadStore();
 
+        alert(mainStore.isServerSet +" / " + mainStore.isLogin);
+
         loginForm.compCodeOnChange(mainStore.serverToken.compCode);
 
         // AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
