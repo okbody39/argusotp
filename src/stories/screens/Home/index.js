@@ -622,7 +622,7 @@ class Home extends React.Component {
                                                 }, 100);
 
                                             }} >
-                                        <Text>로그아웃 ( {mainStore.userToken.userId} )</Text>
+                                        <Text>로그아웃 ( {mainStore.userToken ? mainStore.userToken.userId : "-"} )</Text>
                                     </Button>
                                 </View>
                                 : null

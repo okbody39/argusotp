@@ -5,12 +5,13 @@ const _DEFAULT_KEY_ = "MyScret-YESJYHAN";
 
 import * as React from "react";
 import Constants from 'expo-constants';
-import { Item, Input, Icon, Form, Toast, View, Button, Text } from "native-base";
+import { Item, Input, Icon, Form, Toast, View, Button, Text, Spinner } from "native-base";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
-import {Alert, AsyncStorage, Platform} from "react-native";
-import { Notifications } from "expo";
+import { Alert, AsyncStorage, Platform } from "react-native";
+import * as Notifications from 'expo-notifications'
 import * as Permissions from "expo-permissions";
+import * as Updates from 'expo-updates';
 
 import SmoothPinCodeInput from "react-native-smooth-pincode-input";
 
@@ -37,6 +38,7 @@ export default class LoginContainer extends React.Component {
         // }
 
         this.state = {
+            loading: true,
             userId: loginForm.userId || "",
             password: loginForm.password || "",
             serverIp: loginForm.serverIp || "",
@@ -78,14 +80,31 @@ export default class LoginContainer extends React.Component {
         }
 
         const token = await Notifications.getExpoPushTokenAsync();
-        loginForm.setPushInfo(token);
+        loginForm.setPushInfo(token.data);
 
         const deviceId = Constants.deviceId;
         loginForm.setDeviceId(deviceId);
 
         await mainStore.loadStore();
 
-        alert(mainStore.isServerSet +" / " + mainStore.isLogin);
+        if (mainStore.isServerSet && mainStore.isLogin) {
+            // navigation.navigate("Home");
+            // setTimeout(() => {
+                this.props.navigation.dispatch(
+                    StackActions.reset(
+                        {
+                            index: 0,
+                            key: null,
+                            actions: [NavigationActions.navigate({ routeName: "Home"})],
+                        })
+                );
+            // }, 100);
+            return;
+        }
+
+        this.setState({
+            loading: false,
+        })
 
         loginForm.compCodeOnChange(mainStore.serverToken.compCode);
 
@@ -123,21 +142,46 @@ export default class LoginContainer extends React.Component {
     }
 
     componentDidMount() {
-        const { loginForm, navigation, mainStore } = this.props;
+        // const { loginForm, navigation, mainStore } = this.props;
+        //
+        // mainStore.loadStoreSync();
+        //
+        // if (mainStore.isServerSet && mainStore.isLogin) {
+        //     // navigation.navigate("Home");
+        //     setTimeout(() => {
+        //         this.props.navigation.dispatch(
+        //             StackActions.reset(
+        //                 {
+        //                     index: 0,
+        //                     key: null,
+        //                     actions: [NavigationActions.navigate({ routeName: "Home"})],
+        //                 })
+        //         );
+        //     }, 100);
+        // }
 
-        if (mainStore.isServerSet && mainStore.isLogin) {
-            // navigation.navigate("Home");
-            setTimeout(() => {
-                this.props.navigation.dispatch(
-                    StackActions.reset(
-                        {
-                            index: 0,
-                            key: null,
-                            actions: [NavigationActions.navigate({ routeName: "Home"})],
-                        })
-                );
-            }, 100);
-        }
+        Updates.checkForUpdateAsync().then((update) => {
+            if(update.isAvailable) {
+                Updates.fetchUpdateAsync().then((fetch) => {
+
+                    // alert(JSON.stringify(isNew));
+
+                    if(fetch.isNew) {
+                        Alert.alert(
+                            '업데이트',
+                            '새로운 버전(' + fetch.manifest.version + ')의 앱이 출시되었습니다. [확인]를 누르시면 업데이트를 위해 앱이 재기동 됩니다.',
+                            [
+                                // {text: '아니오', onPress: () => {}, style: 'cancel'},
+                                {text: '확인', onPress: () => {
+                                    setTimeout( () => Updates.reloadAsync(), 500);
+                                }},
+                            ]
+                        );
+                    }
+                });
+            }
+        }); //.catch(err => alert(JSON.stringify(err)));
+
     }
 
 
@@ -255,6 +299,8 @@ export default class LoginContainer extends React.Component {
             email: "",
         };
         let enc = encodeURIComponent(encryptStr(data));
+
+        // alert(JSON.stringify(data));
 
         axios.get("http://" + __LICENSESERVER__+ "/api/register?enc="+enc, {
             // enc : enc,
@@ -386,6 +432,7 @@ export default class LoginContainer extends React.Component {
                 });
 
             } else {
+                // alert(JSON.stringify(err));
                 Toast.show({
                     text: "라이선스 서버 에러",
                     duration: 5000,
@@ -467,47 +514,53 @@ export default class LoginContainer extends React.Component {
             </View>
         );
 
-        return (<Login navigation={this.props.navigation}
-                      isServerSet={ mainStore.isServerSet }
-                      loginForm={ Fields }
-                      settingForm={ settingForm }
-                      onLogin={() => this.login() }
-                      onSave={() => {
-                          AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
-                              let errJson = JSON.parse(errText);
-                              let errCnt = 0;
-                              let errDate = new Date().getTime();
+        return (
+            this.state.loading ?
+                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <Spinner color='#2D2B2C'/>
+                    <Text style={{ fontSize: 15 }}>Checking...</Text>
+                </View> :
+            <Login navigation={this.props.navigation}
+                   isServerSet={ mainStore.isServerSet }
+                   loginForm={ Fields }
+                   settingForm={ settingForm }
+                   onLogin={() => this.login() }
+                   onSave={() => {
+                      AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
+                          let errJson = JSON.parse(errText);
+                          let errCnt = 0;
+                          let errDate = new Date().getTime();
 
-                              if(errJson && errJson.cnt) {
-                                  errCnt = errJson.cnt;
-                                  errDate = errJson.dt;
+                          if(errJson && errJson.cnt) {
+                              errCnt = errJson.cnt;
+                              errDate = errJson.dt;
+                          }
+
+                          // alert(errCnt+" ::: " +errDate);
+
+                          // 5회 이상이면 10분 미만
+                          if(errCnt >= 5) {
+                              let curTime = new Date().getTime();
+
+                              if((curTime - errDate) < (10 * 60 * 1000)) {
+                                  Toast.show({
+                                      text: "최대 시도횟수 초과! ("+Math.round(10-((curTime - errDate)/1000/60), 0)+"분후 가능)",
+                                      duration: 10000,
+                                      position: "top",
+                                      type: "danger",
+                                      textStyle: { textAlign: "center" },
+                                  });
+
+                                  return;
+
                               }
+                          }
 
-                              // alert(errCnt+" ::: " +errDate);
+                          // 5회 이상이고 10분 지났으면
+                          // 5회 미만
 
-                              // 5회 이상이면 10분 미만
-                              if(errCnt >= 5) {
-                                  let curTime = new Date().getTime();
-
-                                  if((curTime - errDate) < (10 * 60 * 1000)) {
-                                      Toast.show({
-                                          text: "최대 시도횟수 초과! ("+Math.round(10-((curTime - errDate)/1000/60), 0)+"분후 가능)",
-                                          duration: 10000,
-                                          position: "top",
-                                          type: "danger",
-                                          textStyle: { textAlign: "center" },
-                                      });
-
-                                      return;
-
-                                  }
-                              }
-
-                              // 5회 이상이고 10분 지났으면
-                              // 5회 미만
-
-                              this.onSave();
-                          });
-                      }} />);
+                          this.onSave();
+                      });
+                  }} />);
     }
 }

@@ -14,6 +14,7 @@ import {
 	Row,
 	Item,
 	Input,
+	Spinner,
 	Form, Toast
 } from "native-base";
 import axios from "axios";
@@ -34,27 +35,26 @@ class Login extends React.Component {
 		const { settingMode } = this.state;
 
 		return (
-			<Container>
-				<Content style={{ backgroundColor: "#2D2B2C" }}>
-					<Body style={{ alignItems: "center", marginTop: 50, marginBottom: 40 }}>
+			<Container style={{backgroundColor: "#2D2B2C"}}>
+				<Content>
+					<Body style={{alignItems: "center", marginTop: 50, marginBottom: 40}}>
 						<Image
 							source={require("../../../../assets/argusotp-logo-white.png")}
-							style={{ height: 70,  resizeMode: 'contain' }}
+							style={{height: 70, resizeMode: 'contain'}}
 						/>
 					</Body>
 					<View padder>
-						{ loginForm }
+						{loginForm}
 					</View>
 
-					<View style={{ margin: 16, marginBottom: 8 }}>
-						<Button rounded block onPress={() => onLogin()} style={{ backgroundColor: "white" }}>
-							<Text style={{ color: "#2D2B2C", fontWeight: "bold" }}>로그인</Text>
+					<View style={{margin: 16, marginBottom: 8}}>
+						<Button rounded block onPress={() => onLogin()} style={{backgroundColor: "white"}}>
+							<Text style={{color: "#2D2B2C", fontWeight: "bold"}}>로그인</Text>
 						</Button>
 					</View>
 
 
 				</Content>
-
 				<KeyboardAvoidingView
 					// behavior={null}
 					// keyboardVerticalOffset={60}

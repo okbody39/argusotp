@@ -42,6 +42,34 @@ class MainStore {
   }
 
   @action
+  loadStoreSync() {
+    try {
+      this.isLogin = false;
+      this.isServerSet = false;
+
+      let userToken = AsyncStorage.getItem("@ArgusOTPStore:userToken");
+      let serverToken = AsyncStorage.getItem("@ArgusOTPStore:serverToken");
+
+      this.userToken = JSON.parse(userToken);
+      this.serverToken = JSON.parse(serverToken);
+
+      // console.log(this.userToken, this.serverToken);
+
+      if (this.userToken && this.userToken.userId.length > 0) {
+        this.isLogin = true;
+      }
+
+      if (this.serverToken && this.serverToken.encKey.length > 0) {
+        this.isServerSet = true;
+      }
+
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+
+  @action
   async saveStore(_userToken, _serverToken) {
     try {
       await this.saveUserStore(_userToken);

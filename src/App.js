@@ -12,8 +12,8 @@ options={{
  */
 const AppStack = createStackNavigator(
 	{
-		Home: { screen: Home },
 		Login: { screen: Login },
+		Home: { screen: Home },
 		Logout: { screen: Login },
 		LockSet: { screen: LockSet },
 	},
