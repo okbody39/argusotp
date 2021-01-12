@@ -29,7 +29,7 @@
         "image": "./assets/argusotp-splash.png"
       },
       "icon": "./assets/argus-icon-ios.png",
-      "buildNumber": "212"
+      "buildNumber": "213"
     },
     "android": {
       "package": "kr.co.cielcloud.argusotp",
@@ -37,6 +37,7 @@
       "icon": "./assets/argus-icon.png",
       "permissions": [
         "CAMERA",
+        "USE_FINGERPRINT",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "com.android.launcher.permission.INSTALL_SHORTCUT",
@@ -57,9 +58,9 @@
         "xxhdpi": "./assets/argusotp-splash.png",
         "xxxhdpi": "./assets/argusotp-splash.png"
       },
-      "versionCode": 212
+      "versionCode": 213
     },
-    "version": "2.1.2",
+    "version": "2.1.3",
     "splash": {
       "backgroundColor": "#ffffff",
       "resizeMode": "contain",
