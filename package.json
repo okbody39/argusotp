@@ -1,6 +1,6 @@
 {
   "name": "ArgusOTP",
-  "version": "2.1.3",
+  "version": "2.1.5",
   "private": true,
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.12.12",

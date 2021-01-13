@@ -8,7 +8,7 @@ import Constants from 'expo-constants';
 import { Item, Input, Icon, Form, Toast, View, Button, Text, Spinner } from "native-base";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
-import { Alert, AsyncStorage, Platform } from "react-native";
+import {Alert, AsyncStorage, Image, Platform} from "react-native";
 import * as Notifications from 'expo-notifications'
 import * as Permissions from "expo-permissions";
 import * as Updates from 'expo-updates';
@@ -517,50 +517,56 @@ export default class LoginContainer extends React.Component {
         return (
             this.state.loading ?
                 <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                    <Image
+                        source={require("../../../assets/argusotp-logo.png")}
+                        style={{ height: 65, resizeMode: 'contain', marginBottom: 3 }}
+                    />
                     <Spinner color='#2D2B2C'/>
                     <Text style={{ fontSize: 15 }}>Checking...</Text>
-                </View> :
-            <Login navigation={this.props.navigation}
-                   isServerSet={ mainStore.isServerSet }
-                   loginForm={ Fields }
-                   settingForm={ settingForm }
-                   onLogin={() => this.login() }
-                   onSave={() => {
-                      AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
-                          let errJson = JSON.parse(errText);
-                          let errCnt = 0;
-                          let errDate = new Date().getTime();
+                </View>
+                :
+                <Login navigation={this.props.navigation}
+                       isServerSet={ mainStore.isServerSet }
+                       loginForm={ Fields }
+                       settingForm={ settingForm }
+                       onLogin={() => this.login() }
+                       onSave={() => {
+                          AsyncStorage.getItem("@ArgusOTPStore:errorCount").then(errText => {
+                              let errJson = JSON.parse(errText);
+                              let errCnt = 0;
+                              let errDate = new Date().getTime();
 
-                          if(errJson && errJson.cnt) {
-                              errCnt = errJson.cnt;
-                              errDate = errJson.dt;
-                          }
-
-                          // alert(errCnt+" ::: " +errDate);
-
-                          // 5회 이상이면 10분 미만
-                          if(errCnt >= 5) {
-                              let curTime = new Date().getTime();
-
-                              if((curTime - errDate) < (10 * 60 * 1000)) {
-                                  Toast.show({
-                                      text: "최대 시도횟수 초과! ("+Math.round(10-((curTime - errDate)/1000/60), 0)+"분후 가능)",
-                                      duration: 10000,
-                                      position: "top",
-                                      type: "danger",
-                                      textStyle: { textAlign: "center" },
-                                  });
-
-                                  return;
-
+                              if(errJson && errJson.cnt) {
+                                  errCnt = errJson.cnt;
+                                  errDate = errJson.dt;
                               }
-                          }
 
-                          // 5회 이상이고 10분 지났으면
-                          // 5회 미만
+                              // alert(errCnt+" ::: " +errDate);
 
-                          this.onSave();
-                      });
-                  }} />);
+                              // 5회 이상이면 10분 미만
+                              if(errCnt >= 5) {
+                                  let curTime = new Date().getTime();
+
+                                  if((curTime - errDate) < (10 * 60 * 1000)) {
+                                      Toast.show({
+                                          text: "최대 시도횟수 초과! ("+Math.round(10-((curTime - errDate)/1000/60), 0)+"분후 가능)",
+                                          duration: 10000,
+                                          position: "top",
+                                          type: "danger",
+                                          textStyle: { textAlign: "center" },
+                                      });
+
+                                      return;
+
+                                  }
+                              }
+
+                              // 5회 이상이고 10분 지났으면
+                              // 5회 미만
+
+                              this.onSave();
+                          });
+                      }} />
+        );
     }
 }

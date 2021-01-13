@@ -69,28 +69,28 @@ const LockSet = (props) => {
 
     let scanFingerprint = async () => {
 
-        if(!compatible){
-            Alert.alert(
-                "생체 인증",
-                "이 단말기는 생체인증을 사용하실 수 없습니다.",
-                [
-                    {text: "OK", onPress: () => setType(1)}
-                ],
-                {cancelable: false}
-            );
-            return;
-
-
-        }
+        // if(!compatible){
+        //     Alert.alert(
+        //         "생체 인증",
+        //         "이 단말기는 생체인증을 사용하실 수 없습니다.",
+        //         [
+        //             {text: "OK", onPress: () => setType(1)}
+        //         ],
+        //         {cancelable: false}
+        //     );
+        //     return;
+        //
+        //
+        // }
 
         if(!fingerprints){
             Alert.alert(
                 "생체 인증",
-                "생체인증 정보를 사용하실 수 없습니다.",
+                "생체인증 정보를 찾을 수 없습니다. 휴대폰의 생체인증을 등록 후 사용해 주세요.",
                 [
                     {text: "OK", onPress: () => setType(1)}
                 ],
-                {cancelable: false}
+                { cancelable: false }
             );
             return;
         }

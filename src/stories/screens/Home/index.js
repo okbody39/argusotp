@@ -241,8 +241,25 @@ class Home extends React.Component {
             }, 500);
 
         }).catch( reason => {
-            Alert.alert('Error', reason.message );
-            console.log(reason.message);
+            // Alert.alert('Error', reason.message );
+            // console.log(reason.message);
+            if(reason.message.indexOf("JSON") !== -1) {
+                Alert.alert(
+                    '정책 업데이트',
+                    '정책이 변동되어 적용을 위해 앱을 재기동합니다. 재기동후 다시 로그인 해주세요.',
+                    [
+                        {
+                            text: 'Restart', onPress: () => mainStore.resetStore().then(() => {
+                                setTimeout( () => Updates.reloadAsync(), 500);
+                            })
+                        },
+                    ],
+                    { cancelable: false }
+                );
+            } else {
+                Alert.alert('Error', reason.message );
+            }
+
         });
 
         // AppState.addEventListener('change', this._handleAppStateChange);
